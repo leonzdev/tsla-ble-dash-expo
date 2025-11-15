@@ -1,0 +1,5685 @@
+{
+  "nested": {
+    "UniversalMessage": {
+      "options": {
+        "go_package": "github.com/teslamotors/vehicle-command/pkg/protocol/protobuf/universalmessage",
+        "java_package": "com.tesla.generated.universalmessage"
+      },
+      "nested": {
+        "Domain": {
+          "values": {
+            "DOMAIN_BROADCAST": 0,
+            "DOMAIN_VEHICLE_SECURITY": 2,
+            "DOMAIN_INFOTAINMENT": 3
+          }
+        },
+        "Destination": {
+          "oneofs": {
+            "subDestination": {
+              "oneof": [
+                "domain",
+                "routingAddress"
+              ]
+            }
+          },
+          "fields": {
+            "domain": {
+              "type": "Domain",
+              "id": 1
+            },
+            "routingAddress": {
+              "type": "bytes",
+              "id": 2
+            }
+          }
+        },
+        "OperationStatus_E": {
+          "values": {
+            "OPERATIONSTATUS_OK": 0,
+            "OPERATIONSTATUS_WAIT": 1,
+            "OPERATIONSTATUS_ERROR": 2
+          }
+        },
+        "MessageFault_E": {
+          "values": {
+            "MESSAGEFAULT_ERROR_NONE": 0,
+            "MESSAGEFAULT_ERROR_BUSY": 1,
+            "MESSAGEFAULT_ERROR_TIMEOUT": 2,
+            "MESSAGEFAULT_ERROR_UNKNOWN_KEY_ID": 3,
+            "MESSAGEFAULT_ERROR_INACTIVE_KEY": 4,
+            "MESSAGEFAULT_ERROR_INVALID_SIGNATURE": 5,
+            "MESSAGEFAULT_ERROR_INVALID_TOKEN_OR_COUNTER": 6,
+            "MESSAGEFAULT_ERROR_INSUFFICIENT_PRIVILEGES": 7,
+            "MESSAGEFAULT_ERROR_INVALID_DOMAINS": 8,
+            "MESSAGEFAULT_ERROR_INVALID_COMMAND": 9,
+            "MESSAGEFAULT_ERROR_DECODING": 10,
+            "MESSAGEFAULT_ERROR_INTERNAL": 11,
+            "MESSAGEFAULT_ERROR_WRONG_PERSONALIZATION": 12,
+            "MESSAGEFAULT_ERROR_BAD_PARAMETER": 13,
+            "MESSAGEFAULT_ERROR_KEYCHAIN_IS_FULL": 14,
+            "MESSAGEFAULT_ERROR_INCORRECT_EPOCH": 15,
+            "MESSAGEFAULT_ERROR_IV_INCORRECT_LENGTH": 16,
+            "MESSAGEFAULT_ERROR_TIME_EXPIRED": 17,
+            "MESSAGEFAULT_ERROR_NOT_PROVISIONED_WITH_IDENTITY": 18,
+            "MESSAGEFAULT_ERROR_COULD_NOT_HASH_METADATA": 19,
+            "MESSAGEFAULT_ERROR_TIME_TO_LIVE_TOO_LONG": 20,
+            "MESSAGEFAULT_ERROR_REMOTE_ACCESS_DISABLED": 21,
+            "MESSAGEFAULT_ERROR_REMOTE_SERVICE_ACCESS_DISABLED": 22,
+            "MESSAGEFAULT_ERROR_COMMAND_REQUIRES_ACCOUNT_CREDENTIALS": 23,
+            "MESSAGEFAULT_ERROR_REQUEST_MTU_EXCEEDED": 24,
+            "MESSAGEFAULT_ERROR_RESPONSE_MTU_EXCEEDED": 25,
+            "MESSAGEFAULT_ERROR_REPEATED_COUNTER": 26,
+            "MESSAGEFAULT_ERROR_INVALID_KEY_HANDLE": 27,
+            "MESSAGEFAULT_ERROR_REQUIRES_RESPONSE_ENCRYPTION": 28
+          }
+        },
+        "MessageStatus": {
+          "fields": {
+            "operationStatus": {
+              "type": "OperationStatus_E",
+              "id": 1
+            },
+            "signedMessageFault": {
+              "type": "MessageFault_E",
+              "id": 2
+            }
+          }
+        },
+        "SessionInfoRequest": {
+          "fields": {
+            "publicKey": {
+              "type": "bytes",
+              "id": 1
+            },
+            "challenge": {
+              "type": "bytes",
+              "id": 2
+            }
+          }
+        },
+        "Flags": {
+          "values": {
+            "FLAG_USER_COMMAND": 0,
+            "FLAG_ENCRYPT_RESPONSE": 1
+          }
+        },
+        "RoutableMessage": {
+          "oneofs": {
+            "payload": {
+              "oneof": [
+                "protobufMessageAsBytes",
+                "sessionInfoRequest",
+                "sessionInfo"
+              ]
+            },
+            "subSigData": {
+              "oneof": [
+                "signatureData"
+              ]
+            }
+          },
+          "fields": {
+            "toDestination": {
+              "type": "Destination",
+              "id": 6
+            },
+            "fromDestination": {
+              "type": "Destination",
+              "id": 7
+            },
+            "protobufMessageAsBytes": {
+              "type": "bytes",
+              "id": 10
+            },
+            "sessionInfoRequest": {
+              "type": "SessionInfoRequest",
+              "id": 14
+            },
+            "sessionInfo": {
+              "type": "bytes",
+              "id": 15
+            },
+            "signatureData": {
+              "type": "Signatures.SignatureData",
+              "id": 13
+            },
+            "signedMessageStatus": {
+              "type": "MessageStatus",
+              "id": 12
+            },
+            "requestUuid": {
+              "type": "bytes",
+              "id": 50
+            },
+            "uuid": {
+              "type": "bytes",
+              "id": 51
+            },
+            "flags": {
+              "type": "uint32",
+              "id": 52
+            }
+          },
+          "reserved": [
+            [
+              1,
+              5
+            ],
+            [
+              16,
+              40
+            ],
+            [
+              11,
+              11
+            ]
+          ]
+        }
+      }
+    },
+    "Signatures": {
+      "options": {
+        "go_package": "github.com/teslamotors/vehicle-command/pkg/protocol/protobuf/signatures",
+        "java_package": "com.tesla.generated.signatures"
+      },
+      "nested": {
+        "Tag": {
+          "values": {
+            "TAG_SIGNATURE_TYPE": 0,
+            "TAG_DOMAIN": 1,
+            "TAG_PERSONALIZATION": 2,
+            "TAG_EPOCH": 3,
+            "TAG_EXPIRES_AT": 4,
+            "TAG_COUNTER": 5,
+            "TAG_CHALLENGE": 6,
+            "TAG_FLAGS": 7,
+            "TAG_REQUEST_HASH": 8,
+            "TAG_FAULT": 9,
+            "TAG_END": 255
+          }
+        },
+        "SignatureType": {
+          "values": {
+            "SIGNATURE_TYPE_AES_GCM": 0,
+            "SIGNATURE_TYPE_AES_GCM_PERSONALIZED": 5,
+            "SIGNATURE_TYPE_HMAC": 6,
+            "SIGNATURE_TYPE_HMAC_PERSONALIZED": 8,
+            "SIGNATURE_TYPE_AES_GCM_RESPONSE": 9
+          },
+          "reserved": [
+            [
+              7,
+              7
+            ]
+          ]
+        },
+        "KeyIdentity": {
+          "oneofs": {
+            "identityType": {
+              "oneof": [
+                "publicKey",
+                "handle"
+              ]
+            }
+          },
+          "fields": {
+            "publicKey": {
+              "type": "bytes",
+              "id": 1
+            },
+            "handle": {
+              "type": "uint32",
+              "id": 3
+            }
+          },
+          "reserved": [
+            [
+              2,
+              2
+            ]
+          ]
+        },
+        "AES_GCM_Personalized_Signature_Data": {
+          "fields": {
+            "epoch": {
+              "type": "bytes",
+              "id": 1
+            },
+            "nonce": {
+              "type": "bytes",
+              "id": 2
+            },
+            "counter": {
+              "type": "uint32",
+              "id": 3
+            },
+            "expiresAt": {
+              "type": "fixed32",
+              "id": 4
+            },
+            "tag": {
+              "type": "bytes",
+              "id": 5
+            }
+          }
+        },
+        "AES_GCM_Response_Signature_Data": {
+          "fields": {
+            "nonce": {
+              "type": "bytes",
+              "id": 1
+            },
+            "counter": {
+              "type": "uint32",
+              "id": 2
+            },
+            "tag": {
+              "type": "bytes",
+              "id": 3
+            }
+          }
+        },
+        "HMAC_Signature_Data": {
+          "fields": {
+            "tag": {
+              "type": "bytes",
+              "id": 1
+            }
+          }
+        },
+        "HMAC_Personalized_Signature_Data": {
+          "fields": {
+            "epoch": {
+              "type": "bytes",
+              "id": 1
+            },
+            "counter": {
+              "type": "uint32",
+              "id": 2
+            },
+            "expiresAt": {
+              "type": "fixed32",
+              "id": 3
+            },
+            "tag": {
+              "type": "bytes",
+              "id": 4
+            }
+          }
+        },
+        "SignatureData": {
+          "oneofs": {
+            "sigType": {
+              "oneof": [
+                "AES_GCM_PersonalizedData",
+                "sessionInfoTag",
+                "HMAC_PersonalizedData",
+                "AES_GCM_ResponseData"
+              ]
+            }
+          },
+          "fields": {
+            "signerIdentity": {
+              "type": "KeyIdentity",
+              "id": 1
+            },
+            "AES_GCM_PersonalizedData": {
+              "type": "AES_GCM_Personalized_Signature_Data",
+              "id": 5
+            },
+            "sessionInfoTag": {
+              "type": "HMAC_Signature_Data",
+              "id": 6
+            },
+            "HMAC_PersonalizedData": {
+              "type": "HMAC_Personalized_Signature_Data",
+              "id": 8
+            },
+            "AES_GCM_ResponseData": {
+              "type": "AES_GCM_Response_Signature_Data",
+              "id": 9
+            }
+          },
+          "reserved": [
+            [
+              7,
+              7
+            ]
+          ]
+        },
+        "GetSessionInfoRequest": {
+          "fields": {
+            "keyIdentity": {
+              "type": "KeyIdentity",
+              "id": 1
+            }
+          }
+        },
+        "Session_Info_Status": {
+          "values": {
+            "SESSION_INFO_STATUS_OK": 0,
+            "SESSION_INFO_STATUS_KEY_NOT_ON_WHITELIST": 1
+          }
+        },
+        "SessionInfo": {
+          "fields": {
+            "counter": {
+              "type": "uint32",
+              "id": 1
+            },
+            "publicKey": {
+              "type": "bytes",
+              "id": 2
+            },
+            "epoch": {
+              "type": "bytes",
+              "id": 3
+            },
+            "clockTime": {
+              "type": "fixed32",
+              "id": 4
+            },
+            "status": {
+              "type": "Session_Info_Status",
+              "id": 5
+            },
+            "handle": {
+              "type": "uint32",
+              "id": 6
+            }
+          }
+        }
+      }
+    },
+    "CarServer": {
+      "options": {
+        "java_package": "com.tesla.generated.carserver.common",
+        "go_package": "github.com/teslamotors/vehicle-command/pkg/protocol/protobuf/carserver",
+        "java_outer_classname": "Vehicle"
+      },
+      "nested": {
+        "Action": {
+          "oneofs": {
+            "actionMsg": {
+              "oneof": [
+                "vehicleAction"
+              ]
+            }
+          },
+          "fields": {
+            "vehicleAction": {
+              "type": "VehicleAction",
+              "id": 2
+            }
+          },
+          "reserved": [
+            [
+              3,
+              5
+            ]
+          ]
+        },
+        "VehicleAction": {
+          "oneofs": {
+            "vehicleActionMsg": {
+              "oneof": [
+                "getVehicleData",
+                "chargingSetLimitAction",
+                "chargingStartStopAction",
+                "drivingClearSpeedLimitPinAction",
+                "drivingSetSpeedLimitAction",
+                "drivingSpeedLimitAction",
+                "hvacAutoAction",
+                "hvacSetPreconditioningMaxAction",
+                "hvacSteeringWheelHeaterAction",
+                "hvacTemperatureAdjustmentAction",
+                "mediaPlayAction",
+                "mediaUpdateVolume",
+                "mediaNextFavorite",
+                "mediaPreviousFavorite",
+                "mediaNextTrack",
+                "mediaPreviousTrack",
+                "getNearbyChargingSites",
+                "vehicleControlCancelSoftwareUpdateAction",
+                "vehicleControlFlashLightsAction",
+                "vehicleControlHonkHornAction",
+                "vehicleControlResetValetPinAction",
+                "vehicleControlScheduleSoftwareUpdateAction",
+                "vehicleControlSetSentryModeAction",
+                "vehicleControlSetValetModeAction",
+                "vehicleControlSunroofOpenCloseAction",
+                "vehicleControlTriggerHomelinkAction",
+                "vehicleControlWindowAction",
+                "hvacBioweaponModeAction",
+                "hvacSeatHeaterActions",
+                "scheduledChargingAction",
+                "scheduledDepartureAction",
+                "setChargingAmpsAction",
+                "hvacClimateKeeperAction",
+                "ping",
+                "autoSeatClimateAction",
+                "hvacSeatCoolerActions",
+                "setCabinOverheatProtectionAction",
+                "setVehicleNameAction",
+                "chargePortDoorClose",
+                "chargePortDoorOpen",
+                "guestModeAction",
+                "setCopTempAction",
+                "eraseUserDataAction",
+                "vehicleControlSetPinToDriveAction",
+                "vehicleControlResetPinToDriveAction",
+                "drivingClearSpeedLimitPinAdminAction",
+                "vehicleControlResetPinToDriveAdminAction",
+                "addChargeScheduleAction",
+                "removeChargeScheduleAction",
+                "addPreconditionScheduleAction",
+                "removePreconditionScheduleAction",
+                "batchRemovePreconditionSchedulesAction",
+                "batchRemoveChargeSchedulesAction",
+                "setLowPowerModeAction"
+              ]
+            }
+          },
+          "fields": {
+            "getVehicleData": {
+              "type": "GetVehicleData",
+              "id": 1
+            },
+            "chargingSetLimitAction": {
+              "type": "ChargingSetLimitAction",
+              "id": 5
+            },
+            "chargingStartStopAction": {
+              "type": "ChargingStartStopAction",
+              "id": 6
+            },
+            "drivingClearSpeedLimitPinAction": {
+              "type": "DrivingClearSpeedLimitPinAction",
+              "id": 7
+            },
+            "drivingSetSpeedLimitAction": {
+              "type": "DrivingSetSpeedLimitAction",
+              "id": 8
+            },
+            "drivingSpeedLimitAction": {
+              "type": "DrivingSpeedLimitAction",
+              "id": 9
+            },
+            "hvacAutoAction": {
+              "type": "HvacAutoAction",
+              "id": 10
+            },
+            "hvacSetPreconditioningMaxAction": {
+              "type": "HvacSetPreconditioningMaxAction",
+              "id": 12
+            },
+            "hvacSteeringWheelHeaterAction": {
+              "type": "HvacSteeringWheelHeaterAction",
+              "id": 13
+            },
+            "hvacTemperatureAdjustmentAction": {
+              "type": "HvacTemperatureAdjustmentAction",
+              "id": 14
+            },
+            "mediaPlayAction": {
+              "type": "MediaPlayAction",
+              "id": 15
+            },
+            "mediaUpdateVolume": {
+              "type": "MediaUpdateVolume",
+              "id": 16
+            },
+            "mediaNextFavorite": {
+              "type": "MediaNextFavorite",
+              "id": 17
+            },
+            "mediaPreviousFavorite": {
+              "type": "MediaPreviousFavorite",
+              "id": 18
+            },
+            "mediaNextTrack": {
+              "type": "MediaNextTrack",
+              "id": 19
+            },
+            "mediaPreviousTrack": {
+              "type": "MediaPreviousTrack",
+              "id": 20
+            },
+            "getNearbyChargingSites": {
+              "type": "GetNearbyChargingSites",
+              "id": 23
+            },
+            "vehicleControlCancelSoftwareUpdateAction": {
+              "type": "VehicleControlCancelSoftwareUpdateAction",
+              "id": 25
+            },
+            "vehicleControlFlashLightsAction": {
+              "type": "VehicleControlFlashLightsAction",
+              "id": 26
+            },
+            "vehicleControlHonkHornAction": {
+              "type": "VehicleControlHonkHornAction",
+              "id": 27
+            },
+            "vehicleControlResetValetPinAction": {
+              "type": "VehicleControlResetValetPinAction",
+              "id": 28
+            },
+            "vehicleControlScheduleSoftwareUpdateAction": {
+              "type": "VehicleControlScheduleSoftwareUpdateAction",
+              "id": 29
+            },
+            "vehicleControlSetSentryModeAction": {
+              "type": "VehicleControlSetSentryModeAction",
+              "id": 30
+            },
+            "vehicleControlSetValetModeAction": {
+              "type": "VehicleControlSetValetModeAction",
+              "id": 31
+            },
+            "vehicleControlSunroofOpenCloseAction": {
+              "type": "VehicleControlSunroofOpenCloseAction",
+              "id": 32
+            },
+            "vehicleControlTriggerHomelinkAction": {
+              "type": "VehicleControlTriggerHomelinkAction",
+              "id": 33
+            },
+            "vehicleControlWindowAction": {
+              "type": "VehicleControlWindowAction",
+              "id": 34
+            },
+            "hvacBioweaponModeAction": {
+              "type": "HvacBioweaponModeAction",
+              "id": 35
+            },
+            "hvacSeatHeaterActions": {
+              "type": "HvacSeatHeaterActions",
+              "id": 36
+            },
+            "scheduledChargingAction": {
+              "type": "ScheduledChargingAction",
+              "id": 41
+            },
+            "scheduledDepartureAction": {
+              "type": "ScheduledDepartureAction",
+              "id": 42
+            },
+            "setChargingAmpsAction": {
+              "type": "SetChargingAmpsAction",
+              "id": 43
+            },
+            "hvacClimateKeeperAction": {
+              "type": "HvacClimateKeeperAction",
+              "id": 44
+            },
+            "ping": {
+              "type": "Ping",
+              "id": 46
+            },
+            "autoSeatClimateAction": {
+              "type": "AutoSeatClimateAction",
+              "id": 48
+            },
+            "hvacSeatCoolerActions": {
+              "type": "HvacSeatCoolerActions",
+              "id": 49
+            },
+            "setCabinOverheatProtectionAction": {
+              "type": "SetCabinOverheatProtectionAction",
+              "id": 50
+            },
+            "setVehicleNameAction": {
+              "type": "SetVehicleNameAction",
+              "id": 54
+            },
+            "chargePortDoorClose": {
+              "type": "ChargePortDoorClose",
+              "id": 61
+            },
+            "chargePortDoorOpen": {
+              "type": "ChargePortDoorOpen",
+              "id": 62
+            },
+            "guestModeAction": {
+              "type": "VehicleState.GuestMode",
+              "id": 65
+            },
+            "setCopTempAction": {
+              "type": "SetCopTempAction",
+              "id": 66
+            },
+            "eraseUserDataAction": {
+              "type": "EraseUserDataAction",
+              "id": 72
+            },
+            "vehicleControlSetPinToDriveAction": {
+              "type": "VehicleControlSetPinToDriveAction",
+              "id": 77
+            },
+            "vehicleControlResetPinToDriveAction": {
+              "type": "VehicleControlResetPinToDriveAction",
+              "id": 78
+            },
+            "drivingClearSpeedLimitPinAdminAction": {
+              "type": "DrivingClearSpeedLimitPinAdminAction",
+              "id": 79
+            },
+            "vehicleControlResetPinToDriveAdminAction": {
+              "type": "VehicleControlResetPinToDriveAdminAction",
+              "id": 89
+            },
+            "addChargeScheduleAction": {
+              "type": "ChargeSchedule",
+              "id": 97
+            },
+            "removeChargeScheduleAction": {
+              "type": "RemoveChargeScheduleAction",
+              "id": 98
+            },
+            "addPreconditionScheduleAction": {
+              "type": "PreconditionSchedule",
+              "id": 99
+            },
+            "removePreconditionScheduleAction": {
+              "type": "RemovePreconditionScheduleAction",
+              "id": 100
+            },
+            "batchRemovePreconditionSchedulesAction": {
+              "type": "BatchRemovePreconditionSchedulesAction",
+              "id": 107
+            },
+            "batchRemoveChargeSchedulesAction": {
+              "type": "BatchRemoveChargeSchedulesAction",
+              "id": 108
+            },
+            "setLowPowerModeAction": {
+              "type": "SetLowPowerModeAction",
+              "id": 130
+            }
+          },
+          "reserved": [
+            [
+              11,
+              11
+            ],
+            [
+              60,
+              60
+            ],
+            [
+              76,
+              76
+            ]
+          ]
+        },
+        "GetVehicleData": {
+          "fields": {
+            "getChargeState": {
+              "type": "GetChargeState",
+              "id": 2
+            },
+            "getClimateState": {
+              "type": "GetClimateState",
+              "id": 3
+            },
+            "getDriveState": {
+              "type": "GetDriveState",
+              "id": 4
+            },
+            "getLocationState": {
+              "type": "GetLocationState",
+              "id": 7
+            },
+            "getClosuresState": {
+              "type": "GetClosuresState",
+              "id": 8
+            },
+            "getChargeScheduleState": {
+              "type": "GetChargeScheduleState",
+              "id": 10
+            },
+            "getPreconditioningScheduleState": {
+              "type": "GetPreconditioningScheduleState",
+              "id": 11
+            },
+            "getTirePressureState": {
+              "type": "GetTirePressureState",
+              "id": 14
+            },
+            "getMediaState": {
+              "type": "GetMediaState",
+              "id": 15
+            },
+            "getMediaDetailState": {
+              "type": "GetMediaDetailState",
+              "id": 16
+            },
+            "getSoftwareUpdateState": {
+              "type": "GetSoftwareUpdateState",
+              "id": 17
+            },
+            "getParentalControlsState": {
+              "type": "GetParentalControlsState",
+              "id": 19
+            }
+          },
+          "reserved": [
+            [
+              5,
+              5
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              12,
+              12
+            ],
+            [
+              13,
+              13
+            ]
+          ]
+        },
+        "GetTirePressureState": {
+          "fields": {}
+        },
+        "GetMediaState": {
+          "fields": {}
+        },
+        "GetMediaDetailState": {
+          "fields": {}
+        },
+        "GetSoftwareUpdateState": {
+          "fields": {}
+        },
+        "GetChargeState": {
+          "fields": {}
+        },
+        "GetClimateState": {
+          "fields": {}
+        },
+        "GetDriveState": {
+          "fields": {}
+        },
+        "GetLocationState": {
+          "fields": {}
+        },
+        "GetClosuresState": {
+          "fields": {}
+        },
+        "GetChargeScheduleState": {
+          "fields": {}
+        },
+        "GetPreconditioningScheduleState": {
+          "fields": {}
+        },
+        "GetParentalControlsState": {
+          "fields": {}
+        },
+        "EraseUserDataAction": {
+          "fields": {
+            "reason": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "Response": {
+          "oneofs": {
+            "responseMsg": {
+              "oneof": [
+                "vehicleData",
+                "getSessionInfoResponse",
+                "getNearbyChargingSites",
+                "ping"
+              ]
+            }
+          },
+          "fields": {
+            "actionStatus": {
+              "type": "ActionStatus",
+              "id": 1
+            },
+            "vehicleData": {
+              "type": "VehicleData",
+              "id": 2
+            },
+            "getSessionInfoResponse": {
+              "type": "Signatures.SessionInfo",
+              "id": 3
+            },
+            "getNearbyChargingSites": {
+              "type": "NearbyChargingSites",
+              "id": 5
+            },
+            "ping": {
+              "type": "Ping",
+              "id": 9
+            }
+          }
+        },
+        "ActionStatus": {
+          "fields": {
+            "result": {
+              "type": "OperationStatus_E",
+              "id": 1
+            },
+            "resultReason": {
+              "type": "ResultReason",
+              "id": 2
+            }
+          }
+        },
+        "OperationStatus_E": {
+          "values": {
+            "OPERATIONSTATUS_OK": 0,
+            "OPERATIONSTATUS_ERROR": 1
+          }
+        },
+        "ResultReason": {
+          "oneofs": {
+            "reason": {
+              "oneof": [
+                "plainText"
+              ]
+            }
+          },
+          "fields": {
+            "plainText": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "EncryptedData": {
+          "fields": {
+            "fieldNumber": {
+              "type": "int32",
+              "id": 1
+            },
+            "ciphertext": {
+              "type": "bytes",
+              "id": 2
+            },
+            "tag": {
+              "type": "bytes",
+              "id": 3
+            }
+          }
+        },
+        "ChargingSetLimitAction": {
+          "fields": {
+            "percent": {
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "ChargingStartStopAction": {
+          "oneofs": {
+            "chargingAction": {
+              "oneof": [
+                "unknown",
+                "start",
+                "startStandard",
+                "startMaxRange",
+                "stop"
+              ]
+            }
+          },
+          "fields": {
+            "unknown": {
+              "type": "Void",
+              "id": 1
+            },
+            "start": {
+              "type": "Void",
+              "id": 2
+            },
+            "startStandard": {
+              "type": "Void",
+              "id": 3
+            },
+            "startMaxRange": {
+              "type": "Void",
+              "id": 4
+            },
+            "stop": {
+              "type": "Void",
+              "id": 5
+            }
+          }
+        },
+        "DrivingClearSpeedLimitPinAction": {
+          "fields": {
+            "pin": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "DrivingClearSpeedLimitPinAdminAction": {
+          "fields": {}
+        },
+        "DrivingSetSpeedLimitAction": {
+          "fields": {
+            "limitMph": {
+              "type": "double",
+              "id": 1
+            }
+          }
+        },
+        "DrivingSpeedLimitAction": {
+          "fields": {
+            "activate": {
+              "type": "bool",
+              "id": 1
+            },
+            "pin": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "HvacAutoAction": {
+          "fields": {
+            "powerOn": {
+              "type": "bool",
+              "id": 1
+            },
+            "manualOverride": {
+              "type": "bool",
+              "id": 2
+            }
+          }
+        },
+        "HvacSeatHeaterActions": {
+          "fields": {
+            "hvacSeatHeaterAction": {
+              "rule": "repeated",
+              "type": "HvacSeatHeaterAction",
+              "id": 1
+            }
+          },
+          "nested": {
+            "HvacSeatHeaterAction": {
+              "oneofs": {
+                "seatHeaterLevel": {
+                  "oneof": [
+                    "SEAT_HEATER_UNKNOWN",
+                    "SEAT_HEATER_OFF",
+                    "SEAT_HEATER_LOW",
+                    "SEAT_HEATER_MED",
+                    "SEAT_HEATER_HIGH"
+                  ]
+                },
+                "seatPosition": {
+                  "oneof": [
+                    "CAR_SEAT_UNKNOWN",
+                    "CAR_SEAT_FRONT_LEFT",
+                    "CAR_SEAT_FRONT_RIGHT",
+                    "CAR_SEAT_REAR_LEFT",
+                    "CAR_SEAT_REAR_LEFT_BACK",
+                    "CAR_SEAT_REAR_CENTER",
+                    "CAR_SEAT_REAR_RIGHT",
+                    "CAR_SEAT_REAR_RIGHT_BACK",
+                    "CAR_SEAT_THIRD_ROW_LEFT",
+                    "CAR_SEAT_THIRD_ROW_RIGHT"
+                  ]
+                }
+              },
+              "fields": {
+                "SEAT_HEATER_UNKNOWN": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "SEAT_HEATER_OFF": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "SEAT_HEATER_LOW": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "SEAT_HEATER_MED": {
+                  "type": "Void",
+                  "id": 4
+                },
+                "SEAT_HEATER_HIGH": {
+                  "type": "Void",
+                  "id": 5
+                },
+                "CAR_SEAT_UNKNOWN": {
+                  "type": "Void",
+                  "id": 6
+                },
+                "CAR_SEAT_FRONT_LEFT": {
+                  "type": "Void",
+                  "id": 7
+                },
+                "CAR_SEAT_FRONT_RIGHT": {
+                  "type": "Void",
+                  "id": 8
+                },
+                "CAR_SEAT_REAR_LEFT": {
+                  "type": "Void",
+                  "id": 9
+                },
+                "CAR_SEAT_REAR_LEFT_BACK": {
+                  "type": "Void",
+                  "id": 10
+                },
+                "CAR_SEAT_REAR_CENTER": {
+                  "type": "Void",
+                  "id": 11
+                },
+                "CAR_SEAT_REAR_RIGHT": {
+                  "type": "Void",
+                  "id": 12
+                },
+                "CAR_SEAT_REAR_RIGHT_BACK": {
+                  "type": "Void",
+                  "id": 13
+                },
+                "CAR_SEAT_THIRD_ROW_LEFT": {
+                  "type": "Void",
+                  "id": 14
+                },
+                "CAR_SEAT_THIRD_ROW_RIGHT": {
+                  "type": "Void",
+                  "id": 15
+                }
+              }
+            }
+          }
+        },
+        "HvacSeatCoolerActions": {
+          "fields": {
+            "hvacSeatCoolerAction": {
+              "rule": "repeated",
+              "type": "HvacSeatCoolerAction",
+              "id": 1
+            }
+          },
+          "nested": {
+            "HvacSeatCoolerLevel_E": {
+              "values": {
+                "HvacSeatCoolerLevel_Unknown": 0,
+                "HvacSeatCoolerLevel_Off": 1,
+                "HvacSeatCoolerLevel_Low": 2,
+                "HvacSeatCoolerLevel_Med": 3,
+                "HvacSeatCoolerLevel_High": 4
+              }
+            },
+            "HvacSeatCoolerPosition_E": {
+              "values": {
+                "HvacSeatCoolerPosition_Unknown": 0,
+                "HvacSeatCoolerPosition_FrontLeft": 1,
+                "HvacSeatCoolerPosition_FrontRight": 2
+              }
+            },
+            "HvacSeatCoolerAction": {
+              "fields": {
+                "seatCoolerLevel": {
+                  "type": "HvacSeatCoolerLevel_E",
+                  "id": 1
+                },
+                "seatPosition": {
+                  "type": "HvacSeatCoolerPosition_E",
+                  "id": 2
+                }
+              }
+            }
+          }
+        },
+        "HvacSetPreconditioningMaxAction": {
+          "fields": {
+            "on": {
+              "type": "bool",
+              "id": 1
+            },
+            "manualOverride": {
+              "type": "bool",
+              "id": 2
+            },
+            "manualOverrideMode": {
+              "rule": "repeated",
+              "type": "ManualOverrideMode_E",
+              "id": 3
+            }
+          },
+          "nested": {
+            "ManualOverrideMode_E": {
+              "values": {
+                "DogMode": 0,
+                "Soc": 1,
+                "Doors": 2
+              }
+            }
+          }
+        },
+        "HvacSteeringWheelHeaterAction": {
+          "fields": {
+            "powerOn": {
+              "type": "bool",
+              "id": 1
+            }
+          }
+        },
+        "HvacTemperatureAdjustmentAction": {
+          "fields": {
+            "deltaCelsius": {
+              "type": "float",
+              "id": 1
+            },
+            "deltaPercent": {
+              "type": "sint32",
+              "id": 2
+            },
+            "absoluteCelsius": {
+              "type": "float",
+              "id": 3
+            },
+            "level": {
+              "type": "Temperature",
+              "id": 5
+            },
+            "hvacTemperatureZone": {
+              "rule": "repeated",
+              "type": "HvacTemperatureZone",
+              "id": 4
+            },
+            "driverTempCelsius": {
+              "type": "float",
+              "id": 6
+            },
+            "passengerTempCelsius": {
+              "type": "float",
+              "id": 7
+            }
+          },
+          "nested": {
+            "Temperature": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "TEMP_UNKNOWN",
+                    "TEMP_MIN",
+                    "TEMP_MAX"
+                  ]
+                }
+              },
+              "fields": {
+                "TEMP_UNKNOWN": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "TEMP_MIN": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "TEMP_MAX": {
+                  "type": "Void",
+                  "id": 3
+                }
+              }
+            },
+            "HvacTemperatureZone": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "TEMP_ZONE_UNKNOWN",
+                    "TEMP_ZONE_FRONT_LEFT",
+                    "TEMP_ZONE_FRONT_RIGHT",
+                    "TEMP_ZONE_REAR"
+                  ]
+                }
+              },
+              "fields": {
+                "TEMP_ZONE_UNKNOWN": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "TEMP_ZONE_FRONT_LEFT": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "TEMP_ZONE_FRONT_RIGHT": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "TEMP_ZONE_REAR": {
+                  "type": "Void",
+                  "id": 4
+                }
+              }
+            }
+          }
+        },
+        "GetNearbyChargingSites": {
+          "fields": {
+            "includeMetaData": {
+              "type": "bool",
+              "id": 1
+            },
+            "radius": {
+              "type": "int32",
+              "id": 2
+            },
+            "count": {
+              "type": "int32",
+              "id": 3
+            }
+          }
+        },
+        "NearbyChargingSites": {
+          "fields": {
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 1
+            },
+            "superchargers": {
+              "rule": "repeated",
+              "type": "Superchargers",
+              "id": 3
+            },
+            "congestionSyncTimeUtcSecs": {
+              "type": "int64",
+              "id": 4
+            }
+          }
+        },
+        "Superchargers": {
+          "fields": {
+            "id": {
+              "type": "int64",
+              "id": 1
+            },
+            "amenities": {
+              "type": "string",
+              "id": 2
+            },
+            "availableStalls": {
+              "type": "int32",
+              "id": 3
+            },
+            "billingInfo": {
+              "type": "string",
+              "id": 4
+            },
+            "billingTime": {
+              "type": "string",
+              "id": 5
+            },
+            "city": {
+              "type": "string",
+              "id": 6
+            },
+            "country": {
+              "type": "string",
+              "id": 7
+            },
+            "distanceMiles": {
+              "type": "float",
+              "id": 8
+            },
+            "district": {
+              "type": "string",
+              "id": 9
+            },
+            "location": {
+              "type": "LatLong",
+              "id": 10
+            },
+            "name": {
+              "type": "string",
+              "id": 11
+            },
+            "postalCode": {
+              "type": "string",
+              "id": 12
+            },
+            "siteClosed": {
+              "type": "bool",
+              "id": 13
+            },
+            "state": {
+              "type": "string",
+              "id": 14
+            },
+            "streetAddress": {
+              "type": "string",
+              "id": 15
+            },
+            "totalStalls": {
+              "type": "int32",
+              "id": 16
+            },
+            "withinRange": {
+              "type": "bool",
+              "id": 17
+            },
+            "maxPowerKw": {
+              "type": "int32",
+              "id": 18
+            },
+            "outOfOrderStallsNumber": {
+              "type": "int32",
+              "id": 19
+            },
+            "outOfOrderStallsNames": {
+              "type": "string",
+              "id": 20
+            }
+          }
+        },
+        "MediaPlayAction": {
+          "fields": {}
+        },
+        "MediaUpdateVolume": {
+          "oneofs": {
+            "mediaVolume": {
+              "oneof": [
+                "volumeDelta",
+                "volumeAbsoluteFloat"
+              ]
+            }
+          },
+          "fields": {
+            "volumeDelta": {
+              "type": "sint32",
+              "id": 1
+            },
+            "volumeAbsoluteFloat": {
+              "type": "float",
+              "id": 3
+            }
+          },
+          "reserved": [
+            [
+              2,
+              2
+            ]
+          ]
+        },
+        "MediaNextFavorite": {
+          "fields": {}
+        },
+        "MediaPreviousFavorite": {
+          "fields": {}
+        },
+        "MediaNextTrack": {
+          "fields": {}
+        },
+        "MediaPreviousTrack": {
+          "fields": {}
+        },
+        "VehicleControlCancelSoftwareUpdateAction": {
+          "fields": {}
+        },
+        "VehicleControlFlashLightsAction": {
+          "fields": {}
+        },
+        "VehicleControlHonkHornAction": {
+          "fields": {}
+        },
+        "VehicleControlResetValetPinAction": {
+          "fields": {}
+        },
+        "VehicleControlScheduleSoftwareUpdateAction": {
+          "fields": {
+            "offsetSec": {
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "VehicleControlSetSentryModeAction": {
+          "fields": {
+            "on": {
+              "type": "bool",
+              "id": 1
+            }
+          }
+        },
+        "VehicleControlSetValetModeAction": {
+          "fields": {
+            "on": {
+              "type": "bool",
+              "id": 1
+            },
+            "password": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "VehicleControlSunroofOpenCloseAction": {
+          "oneofs": {
+            "sunroofLevel": {
+              "oneof": [
+                "absoluteLevel",
+                "deltaLevel"
+              ]
+            },
+            "action": {
+              "oneof": [
+                "vent",
+                "close",
+                "open"
+              ]
+            }
+          },
+          "fields": {
+            "absoluteLevel": {
+              "type": "int32",
+              "id": 1
+            },
+            "deltaLevel": {
+              "type": "sint32",
+              "id": 2
+            },
+            "vent": {
+              "type": "Void",
+              "id": 3
+            },
+            "close": {
+              "type": "Void",
+              "id": 4
+            },
+            "open": {
+              "type": "Void",
+              "id": 5
+            }
+          }
+        },
+        "VehicleControlTriggerHomelinkAction": {
+          "fields": {
+            "location": {
+              "type": "LatLong",
+              "id": 1
+            },
+            "token": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "VehicleControlWindowAction": {
+          "oneofs": {
+            "action": {
+              "oneof": [
+                "unknown",
+                "vent",
+                "close"
+              ]
+            }
+          },
+          "fields": {
+            "unknown": {
+              "type": "Void",
+              "id": 2
+            },
+            "vent": {
+              "type": "Void",
+              "id": 3
+            },
+            "close": {
+              "type": "Void",
+              "id": 4
+            }
+          },
+          "reserved": [
+            [
+              1,
+              1
+            ]
+          ]
+        },
+        "HvacBioweaponModeAction": {
+          "fields": {
+            "on": {
+              "type": "bool",
+              "id": 1
+            },
+            "manualOverride": {
+              "type": "bool",
+              "id": 2
+            }
+          }
+        },
+        "AutoSeatClimateAction": {
+          "fields": {
+            "carseat": {
+              "rule": "repeated",
+              "type": "CarSeat",
+              "id": 1
+            }
+          },
+          "nested": {
+            "AutoSeatPosition_E": {
+              "values": {
+                "AutoSeatPosition_Unknown": 0,
+                "AutoSeatPosition_FrontLeft": 1,
+                "AutoSeatPosition_FrontRight": 2
+              }
+            },
+            "CarSeat": {
+              "fields": {
+                "on": {
+                  "type": "bool",
+                  "id": 1
+                },
+                "seatPosition": {
+                  "type": "AutoSeatPosition_E",
+                  "id": 2
+                }
+              }
+            }
+          }
+        },
+        "Ping": {
+          "fields": {
+            "pingId": {
+              "type": "int32",
+              "id": 1
+            },
+            "localTimestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 2
+            },
+            "lastRemoteTimestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 3
+            }
+          }
+        },
+        "ScheduledChargingAction": {
+          "fields": {
+            "enabled": {
+              "type": "bool",
+              "id": 1
+            },
+            "chargingTime": {
+              "type": "int32",
+              "id": 2
+            }
+          }
+        },
+        "ScheduledDepartureAction": {
+          "fields": {
+            "enabled": {
+              "type": "bool",
+              "id": 1
+            },
+            "departureTime": {
+              "type": "int32",
+              "id": 2
+            },
+            "preconditioningTimes": {
+              "type": "PreconditioningTimes",
+              "id": 3
+            },
+            "offPeakChargingTimes": {
+              "type": "OffPeakChargingTimes",
+              "id": 4
+            },
+            "offPeakHoursEndTime": {
+              "type": "int32",
+              "id": 5
+            }
+          }
+        },
+        "HvacClimateKeeperAction": {
+          "fields": {
+            "ClimateKeeperAction": {
+              "type": "ClimateKeeperAction_E",
+              "id": 1
+            },
+            "manualOverride": {
+              "type": "bool",
+              "id": 2
+            }
+          },
+          "nested": {
+            "ClimateKeeperAction_E": {
+              "values": {
+                "ClimateKeeperAction_Off": 0,
+                "ClimateKeeperAction_On": 1,
+                "ClimateKeeperAction_Dog": 2,
+                "ClimateKeeperAction_Camp": 3
+              }
+            }
+          }
+        },
+        "SetChargingAmpsAction": {
+          "fields": {
+            "chargingAmps": {
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "RemoveChargeScheduleAction": {
+          "fields": {
+            "id": {
+              "type": "uint64",
+              "id": 1
+            }
+          }
+        },
+        "BatchRemoveChargeSchedulesAction": {
+          "fields": {
+            "home": {
+              "type": "bool",
+              "id": 1
+            },
+            "work": {
+              "type": "bool",
+              "id": 2
+            },
+            "other": {
+              "type": "bool",
+              "id": 3
+            }
+          }
+        },
+        "BatchRemovePreconditionSchedulesAction": {
+          "fields": {
+            "home": {
+              "type": "bool",
+              "id": 1
+            },
+            "work": {
+              "type": "bool",
+              "id": 2
+            },
+            "other": {
+              "type": "bool",
+              "id": 3
+            }
+          }
+        },
+        "RemovePreconditionScheduleAction": {
+          "fields": {
+            "id": {
+              "type": "uint64",
+              "id": 1
+            }
+          }
+        },
+        "SetCabinOverheatProtectionAction": {
+          "fields": {
+            "on": {
+              "type": "bool",
+              "id": 1
+            },
+            "fanOnly": {
+              "type": "bool",
+              "id": 2
+            }
+          }
+        },
+        "SetVehicleNameAction": {
+          "fields": {
+            "vehicleName": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "ChargePortDoorClose": {
+          "fields": {}
+        },
+        "ChargePortDoorOpen": {
+          "fields": {}
+        },
+        "SetCopTempAction": {
+          "fields": {
+            "copActivationTemp": {
+              "type": "ClimateState.CopActivationTemp",
+              "id": 1
+            }
+          }
+        },
+        "VehicleControlSetPinToDriveAction": {
+          "fields": {
+            "on": {
+              "type": "bool",
+              "id": 1
+            },
+            "password": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "VehicleControlResetPinToDriveAction": {
+          "fields": {}
+        },
+        "VehicleControlResetPinToDriveAdminAction": {
+          "fields": {}
+        },
+        "SetLowPowerModeAction": {
+          "fields": {
+            "lowPowerMode": {
+              "type": "bool",
+              "id": 1
+            }
+          }
+        },
+        "VehicleData": {
+          "fields": {
+            "chargeState": {
+              "type": "ChargeState",
+              "id": 3
+            },
+            "climateState": {
+              "type": "ClimateState",
+              "id": 4
+            },
+            "driveState": {
+              "type": "DriveState",
+              "id": 5
+            },
+            "locationState": {
+              "type": "LocationState",
+              "id": 8
+            },
+            "closuresState": {
+              "type": "ClosuresState",
+              "id": 9
+            },
+            "chargeScheduleState": {
+              "type": "ChargeScheduleState",
+              "id": 15
+            },
+            "preconditioningScheduleState": {
+              "type": "PreconditioningScheduleState",
+              "id": 16
+            },
+            "tirePressureState": {
+              "type": "TirePressureState",
+              "id": 19
+            },
+            "mediaState": {
+              "type": "MediaState",
+              "id": 20
+            },
+            "mediaDetailState": {
+              "type": "MediaDetailState",
+              "id": 21
+            },
+            "softwareUpdateState": {
+              "type": "SoftwareUpdateState",
+              "id": 23
+            },
+            "parentalControlsState": {
+              "type": "ParentalControlsState",
+              "id": 24
+            }
+          }
+        },
+        "ClosuresState": {
+          "oneofs": {
+            "optionalDoorOpenDriverFront": {
+              "oneof": [
+                "doorOpenDriverFront"
+              ]
+            },
+            "optionalDoorOpenDriverRear": {
+              "oneof": [
+                "doorOpenDriverRear"
+              ]
+            },
+            "optionalDoorOpenPassengerFront": {
+              "oneof": [
+                "doorOpenPassengerFront"
+              ]
+            },
+            "optionalDoorOpenPassengerRear": {
+              "oneof": [
+                "doorOpenPassengerRear"
+              ]
+            },
+            "optionalDoorOpenTrunkFront": {
+              "oneof": [
+                "doorOpenTrunkFront"
+              ]
+            },
+            "optionalDoorOpenTrunkRear": {
+              "oneof": [
+                "doorOpenTrunkRear"
+              ]
+            },
+            "optionalWindowOpenDriverFront": {
+              "oneof": [
+                "windowOpenDriverFront"
+              ]
+            },
+            "optionalWindowOpenPassengerFront": {
+              "oneof": [
+                "windowOpenPassengerFront"
+              ]
+            },
+            "optionalWindowOpenDriverRear": {
+              "oneof": [
+                "windowOpenDriverRear"
+              ]
+            },
+            "optionalWindowOpenPassengerRear": {
+              "oneof": [
+                "windowOpenPassengerRear"
+              ]
+            },
+            "optionalSunRoofPercentOpen": {
+              "oneof": [
+                "sunRoofPercentOpen"
+              ]
+            },
+            "optionalLocked": {
+              "oneof": [
+                "locked"
+              ]
+            },
+            "optionalIsUserPresent": {
+              "oneof": [
+                "isUserPresent"
+              ]
+            },
+            "optionalRemoteStart": {
+              "oneof": [
+                "remoteStart"
+              ]
+            },
+            "optionalValetMode": {
+              "oneof": [
+                "valetMode"
+              ]
+            },
+            "optionalValetPinNeeded": {
+              "oneof": [
+                "valetPinNeeded"
+              ]
+            },
+            "optionalSentryModeAvailable": {
+              "oneof": [
+                "sentryModeAvailable"
+              ]
+            },
+            "optionalTonneauState": {
+              "oneof": [
+                "tonneauState"
+              ]
+            },
+            "optionalTonneauPercentOpen": {
+              "oneof": [
+                "tonneauPercentOpen"
+              ]
+            },
+            "optionalTonneauInMotion": {
+              "oneof": [
+                "tonneauInMotion"
+              ]
+            }
+          },
+          "fields": {
+            "doorOpenDriverFront": {
+              "type": "bool",
+              "id": 101
+            },
+            "doorOpenDriverRear": {
+              "type": "bool",
+              "id": 102
+            },
+            "doorOpenPassengerFront": {
+              "type": "bool",
+              "id": 103
+            },
+            "doorOpenPassengerRear": {
+              "type": "bool",
+              "id": 104
+            },
+            "doorOpenTrunkFront": {
+              "type": "bool",
+              "id": 105
+            },
+            "doorOpenTrunkRear": {
+              "type": "bool",
+              "id": 106
+            },
+            "windowOpenDriverFront": {
+              "type": "bool",
+              "id": 107
+            },
+            "windowOpenPassengerFront": {
+              "type": "bool",
+              "id": 108
+            },
+            "windowOpenDriverRear": {
+              "type": "bool",
+              "id": 109
+            },
+            "windowOpenPassengerRear": {
+              "type": "bool",
+              "id": 110
+            },
+            "sunRoofState": {
+              "type": "SunRoofState",
+              "id": 11
+            },
+            "sunRoofPercentOpen": {
+              "type": "int32",
+              "id": 112
+            },
+            "locked": {
+              "type": "bool",
+              "id": 113
+            },
+            "isUserPresent": {
+              "type": "bool",
+              "id": 114
+            },
+            "centerDisplayState": {
+              "type": "DisplayState",
+              "id": 15
+            },
+            "remoteStart": {
+              "type": "bool",
+              "id": 116
+            },
+            "valetMode": {
+              "type": "bool",
+              "id": 117
+            },
+            "valetPinNeeded": {
+              "type": "bool",
+              "id": 118
+            },
+            "sentryModeState": {
+              "type": "SentryModeState",
+              "id": 19
+            },
+            "sentryModeAvailable": {
+              "type": "bool",
+              "id": 120
+            },
+            "speedLimitMode": {
+              "type": "SpeedLimitMode",
+              "id": 22
+            },
+            "tonneauState": {
+              "type": "VCSEC.ClosureState_E",
+              "id": 23
+            },
+            "tonneauPercentOpen": {
+              "type": "uint32",
+              "id": 24
+            },
+            "tonneauInMotion": {
+              "type": "bool",
+              "id": 25
+            },
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 2000
+            }
+          },
+          "nested": {
+            "SunRoofState": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "Unknown",
+                    "Calibrating",
+                    "Closed",
+                    "Open",
+                    "Moving",
+                    "Vent"
+                  ]
+                }
+              },
+              "fields": {
+                "Unknown": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "Calibrating": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "Closed": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "Open": {
+                  "type": "Void",
+                  "id": 4
+                },
+                "Moving": {
+                  "type": "Void",
+                  "id": 5
+                },
+                "Vent": {
+                  "type": "Void",
+                  "id": 6
+                }
+              }
+            },
+            "DisplayState": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "Off",
+                    "Dim",
+                    "Accessory",
+                    "On",
+                    "Driving",
+                    "Charging",
+                    "Lock",
+                    "Sentry",
+                    "Dog",
+                    "Entertainment"
+                  ]
+                }
+              },
+              "fields": {
+                "Off": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "Dim": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "Accessory": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "On": {
+                  "type": "Void",
+                  "id": 4
+                },
+                "Driving": {
+                  "type": "Void",
+                  "id": 5
+                },
+                "Charging": {
+                  "type": "Void",
+                  "id": 6
+                },
+                "Lock": {
+                  "type": "Void",
+                  "id": 7
+                },
+                "Sentry": {
+                  "type": "Void",
+                  "id": 8
+                },
+                "Dog": {
+                  "type": "Void",
+                  "id": 9
+                },
+                "Entertainment": {
+                  "type": "Void",
+                  "id": 10
+                }
+              }
+            },
+            "SentryModeState": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "Off",
+                    "Idle",
+                    "Armed",
+                    "Aware",
+                    "Panic",
+                    "Quiet"
+                  ]
+                }
+              },
+              "fields": {
+                "Off": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "Idle": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "Armed": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "Aware": {
+                  "type": "Void",
+                  "id": 4
+                },
+                "Panic": {
+                  "type": "Void",
+                  "id": 5
+                },
+                "Quiet": {
+                  "type": "Void",
+                  "id": 6
+                }
+              }
+            }
+          }
+        },
+        "ChargeScheduleState": {
+          "oneofs": {
+            "optionalChargeScheduleWindow": {
+              "oneof": [
+                "chargeScheduleWindow"
+              ]
+            },
+            "optionalChargeBuffer": {
+              "oneof": [
+                "chargeBuffer"
+              ]
+            },
+            "optionalMaxNumChargeSchedules": {
+              "oneof": [
+                "maxNumChargeSchedules"
+              ]
+            },
+            "optionalNextSchedule": {
+              "oneof": [
+                "nextSchedule"
+              ]
+            },
+            "optionalShowScheduleCompleteState": {
+              "oneof": [
+                "showScheduleCompleteState"
+              ]
+            }
+          },
+          "fields": {
+            "chargeSchedules": {
+              "rule": "repeated",
+              "type": "ChargeSchedule",
+              "id": 1
+            },
+            "chargeScheduleWindow": {
+              "type": "ChargeSchedule",
+              "id": 2
+            },
+            "chargeBuffer": {
+              "type": "int32",
+              "id": 3
+            },
+            "maxNumChargeSchedules": {
+              "type": "uint32",
+              "id": 4
+            },
+            "nextSchedule": {
+              "type": "bool",
+              "id": 5
+            },
+            "showScheduleCompleteState": {
+              "type": "bool",
+              "id": 6
+            },
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 2000
+            }
+          }
+        },
+        "PreconditioningScheduleState": {
+          "oneofs": {
+            "optionalPreconditioningScheduleWindow": {
+              "oneof": [
+                "preconditioningScheduleWindow"
+              ]
+            },
+            "optionalMaxNumPreconditionSchedules": {
+              "oneof": [
+                "maxNumPreconditionSchedules"
+              ]
+            },
+            "optionalNextSchedule": {
+              "oneof": [
+                "nextSchedule"
+              ]
+            }
+          },
+          "fields": {
+            "preconditionSchedules": {
+              "rule": "repeated",
+              "type": "PreconditionSchedule",
+              "id": 1
+            },
+            "preconditioningScheduleWindow": {
+              "type": "PreconditionSchedule",
+              "id": 2
+            },
+            "maxNumPreconditionSchedules": {
+              "type": "uint32",
+              "id": 3
+            },
+            "nextSchedule": {
+              "type": "bool",
+              "id": 4
+            },
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 2000
+            }
+          }
+        },
+        "SpeedLimitMode": {
+          "oneofs": {
+            "optionalActive": {
+              "oneof": [
+                "active"
+              ]
+            },
+            "optionalPinCodeSet": {
+              "oneof": [
+                "pinCodeSet"
+              ]
+            },
+            "optionalMaxLimitMph": {
+              "oneof": [
+                "maxLimitMph"
+              ]
+            },
+            "optionalMinLimitMph": {
+              "oneof": [
+                "minLimitMph"
+              ]
+            },
+            "optionalCurrentLimitMph": {
+              "oneof": [
+                "currentLimitMph"
+              ]
+            }
+          },
+          "fields": {
+            "active": {
+              "type": "bool",
+              "id": 103
+            },
+            "pinCodeSet": {
+              "type": "bool",
+              "id": 104
+            },
+            "maxLimitMph": {
+              "type": "float",
+              "id": 106
+            },
+            "minLimitMph": {
+              "type": "float",
+              "id": 107
+            },
+            "currentLimitMph": {
+              "type": "float",
+              "id": 108
+            }
+          }
+        },
+        "ParentalControlsSettings": {
+          "oneofs": {
+            "optionalSpeedLimitEnabled": {
+              "oneof": [
+                "speedLimitEnabled"
+              ]
+            },
+            "optionalMaxLimitMph": {
+              "oneof": [
+                "maxLimitMph"
+              ]
+            },
+            "optionalMinLimitMph": {
+              "oneof": [
+                "minLimitMph"
+              ]
+            },
+            "optionalCurrentLimitMph": {
+              "oneof": [
+                "currentLimitMph"
+              ]
+            },
+            "optionalChillAccelerationEnabled": {
+              "oneof": [
+                "chillAccelerationEnabled"
+              ]
+            },
+            "optionalRequireSafetySettingsEnabled": {
+              "oneof": [
+                "requireSafetySettingsEnabled"
+              ]
+            },
+            "optionalCurfewEnabled": {
+              "oneof": [
+                "curfewEnabled"
+              ]
+            },
+            "optionalCurfewStartTime": {
+              "oneof": [
+                "curfewStartTime"
+              ]
+            },
+            "optionalCurfewEndTime": {
+              "oneof": [
+                "curfewEndTime"
+              ]
+            }
+          },
+          "fields": {
+            "speedLimitEnabled": {
+              "type": "bool",
+              "id": 1
+            },
+            "maxLimitMph": {
+              "type": "float",
+              "id": 2
+            },
+            "minLimitMph": {
+              "type": "float",
+              "id": 3
+            },
+            "currentLimitMph": {
+              "type": "float",
+              "id": 4
+            },
+            "chillAccelerationEnabled": {
+              "type": "bool",
+              "id": 5
+            },
+            "requireSafetySettingsEnabled": {
+              "type": "bool",
+              "id": 6
+            },
+            "curfewEnabled": {
+              "type": "bool",
+              "id": 7
+            },
+            "curfewStartTime": {
+              "type": "int32",
+              "id": 8
+            },
+            "curfewEndTime": {
+              "type": "int32",
+              "id": 9
+            }
+          }
+        },
+        "ParentalControlsState": {
+          "oneofs": {
+            "optionalParentalControlsActive": {
+              "oneof": [
+                "parentalControlsActive"
+              ]
+            },
+            "optionalParentalControlsPinSet": {
+              "oneof": [
+                "parentalControlsPinSet"
+              ]
+            }
+          },
+          "fields": {
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 1
+            },
+            "parentalControlsActive": {
+              "type": "bool",
+              "id": 2
+            },
+            "parentalControlsPinSet": {
+              "type": "bool",
+              "id": 3
+            },
+            "parentalControlsSettings": {
+              "type": "ParentalControlsSettings",
+              "id": 4
+            }
+          }
+        },
+        "SoftwareUpdateState": {
+          "oneofs": {
+            "optionalScheduledTimeMs": {
+              "oneof": [
+                "scheduledTimeMs"
+              ]
+            },
+            "optionalWarningTimeRemainingMs": {
+              "oneof": [
+                "warningTimeRemainingMs"
+              ]
+            },
+            "optionalExpectedDurationSec": {
+              "oneof": [
+                "expectedDurationSec"
+              ]
+            },
+            "optionalDownloadPerc": {
+              "oneof": [
+                "downloadPerc"
+              ]
+            },
+            "optionalInstallPerc": {
+              "oneof": [
+                "installPerc"
+              ]
+            },
+            "optionalVersion": {
+              "oneof": [
+                "version"
+              ]
+            }
+          },
+          "fields": {
+            "status": {
+              "type": "SoftwareUpdateStatus",
+              "id": 1
+            },
+            "scheduledTimeMs": {
+              "type": "uint64",
+              "id": 102
+            },
+            "warningTimeRemainingMs": {
+              "type": "uint64",
+              "id": 103
+            },
+            "expectedDurationSec": {
+              "type": "uint32",
+              "id": 104
+            },
+            "downloadPerc": {
+              "type": "uint32",
+              "id": 105
+            },
+            "installPerc": {
+              "type": "uint32",
+              "id": 106
+            },
+            "version": {
+              "type": "string",
+              "id": 107
+            },
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 108
+            }
+          },
+          "nested": {
+            "SoftwareUpdateStatus": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "Unknown",
+                    "Installing",
+                    "Scheduled",
+                    "Available",
+                    "DownloadingWifiWait",
+                    "Downloading"
+                  ]
+                }
+              },
+              "fields": {
+                "Unknown": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "Installing": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "Scheduled": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "Available": {
+                  "type": "Void",
+                  "id": 4
+                },
+                "DownloadingWifiWait": {
+                  "type": "Void",
+                  "id": 5
+                },
+                "Downloading": {
+                  "type": "Void",
+                  "id": 6
+                }
+              }
+            }
+          }
+        },
+        "DriveState": {
+          "oneofs": {
+            "optionalSpeed": {
+              "oneof": [
+                "speed"
+              ]
+            },
+            "optionalPower": {
+              "oneof": [
+                "power"
+              ]
+            },
+            "optionalOdometerInHundredthsOfAMile": {
+              "oneof": [
+                "odometerInHundredthsOfAMile"
+              ]
+            },
+            "optionalSpeedFloat": {
+              "oneof": [
+                "speedFloat"
+              ]
+            },
+            "optionalActiveRouteDestination": {
+              "oneof": [
+                "activeRouteDestination"
+              ]
+            },
+            "optionalActiveRouteMinutesToArrival": {
+              "oneof": [
+                "activeRouteMinutesToArrival"
+              ]
+            },
+            "optionalActiveRouteMilesToArrival": {
+              "oneof": [
+                "activeRouteMilesToArrival"
+              ]
+            },
+            "optionalActiveRouteTrafficMinutesDelay": {
+              "oneof": [
+                "activeRouteTrafficMinutesDelay"
+              ]
+            },
+            "optionalActiveRouteEnergyAtArrival": {
+              "oneof": [
+                "activeRouteEnergyAtArrival"
+              ]
+            },
+            "optionalLastRouteUpdate": {
+              "oneof": [
+                "lastRouteUpdate"
+              ]
+            }
+          },
+          "fields": {
+            "shiftState": {
+              "type": "ShiftState",
+              "id": 1
+            },
+            "speed": {
+              "type": "uint32",
+              "id": 102
+            },
+            "power": {
+              "type": "int32",
+              "id": 103
+            },
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 4
+            },
+            "odometerInHundredthsOfAMile": {
+              "type": "int32",
+              "id": 105
+            },
+            "speedFloat": {
+              "type": "float",
+              "id": 106
+            },
+            "activeRouteDestination": {
+              "type": "string",
+              "id": 7
+            },
+            "activeRouteMinutesToArrival": {
+              "type": "float",
+              "id": 8
+            },
+            "activeRouteMilesToArrival": {
+              "type": "float",
+              "id": 9
+            },
+            "activeRouteTrafficMinutesDelay": {
+              "type": "float",
+              "id": 10
+            },
+            "activeRouteEnergyAtArrival": {
+              "type": "float",
+              "id": 11
+            },
+            "lastRouteUpdate": {
+              "type": "uint32",
+              "id": 14
+            },
+            "lastTrafficUpdate": {
+              "type": "google.protobuf.Timestamp",
+              "id": 15
+            },
+            "activeRouteCoordinates": {
+              "type": "LatLong",
+              "id": 12
+            }
+          }
+        },
+        "ChargeState": {
+          "oneofs": {
+            "optionalChargeLimitSoc": {
+              "oneof": [
+                "chargeLimitSoc"
+              ]
+            },
+            "optionalChargeLimitSocStd": {
+              "oneof": [
+                "chargeLimitSocStd"
+              ]
+            },
+            "optionalChargeLimitSocMin": {
+              "oneof": [
+                "chargeLimitSocMin"
+              ]
+            },
+            "optionalChargeLimitSocMax": {
+              "oneof": [
+                "chargeLimitSocMax"
+              ]
+            },
+            "optionalMaxRangeChargeCounter": {
+              "oneof": [
+                "maxRangeChargeCounter"
+              ]
+            },
+            "optionalFastChargerPresent": {
+              "oneof": [
+                "fastChargerPresent"
+              ]
+            },
+            "optionalBatteryRange": {
+              "oneof": [
+                "batteryRange"
+              ]
+            },
+            "optionalEstBatteryRange": {
+              "oneof": [
+                "estBatteryRange"
+              ]
+            },
+            "optionalIdealBatteryRange": {
+              "oneof": [
+                "idealBatteryRange"
+              ]
+            },
+            "optionalBatteryLevel": {
+              "oneof": [
+                "batteryLevel"
+              ]
+            },
+            "optionalUsableBatteryLevel": {
+              "oneof": [
+                "usableBatteryLevel"
+              ]
+            },
+            "optionalChargeEnergyAdded": {
+              "oneof": [
+                "chargeEnergyAdded"
+              ]
+            },
+            "optionalChargeMilesAddedRated": {
+              "oneof": [
+                "chargeMilesAddedRated"
+              ]
+            },
+            "optionalChargeMilesAddedIdeal": {
+              "oneof": [
+                "chargeMilesAddedIdeal"
+              ]
+            },
+            "optionalChargerVoltage": {
+              "oneof": [
+                "chargerVoltage"
+              ]
+            },
+            "optionalChargerPilotCurrent": {
+              "oneof": [
+                "chargerPilotCurrent"
+              ]
+            },
+            "optionalChargerActualCurrent": {
+              "oneof": [
+                "chargerActualCurrent"
+              ]
+            },
+            "optionalChargerPower": {
+              "oneof": [
+                "chargerPower"
+              ]
+            },
+            "optionalMinutesToFullCharge": {
+              "oneof": [
+                "minutesToFullCharge"
+              ]
+            },
+            "optionalMinutesToChargeLimit": {
+              "oneof": [
+                "minutesToChargeLimit"
+              ]
+            },
+            "optionalTripCharging": {
+              "oneof": [
+                "tripCharging"
+              ]
+            },
+            "optionalChargeRateMph": {
+              "oneof": [
+                "chargeRateMph"
+              ]
+            },
+            "optionalChargePortDoorOpen": {
+              "oneof": [
+                "chargePortDoorOpen"
+              ]
+            },
+            "optionalScheduledChargingStartTime": {
+              "oneof": [
+                "scheduledChargingStartTime"
+              ]
+            },
+            "optionalScheduledChargingPending": {
+              "oneof": [
+                "scheduledChargingPending"
+              ]
+            },
+            "optionalUserChargeEnableRequest": {
+              "oneof": [
+                "userChargeEnableRequest"
+              ]
+            },
+            "optionalChargeEnableRequest": {
+              "oneof": [
+                "chargeEnableRequest"
+              ]
+            },
+            "optionalChargerPhases": {
+              "oneof": [
+                "chargerPhases"
+              ]
+            },
+            "optionalChargePortColdWeatherMode": {
+              "oneof": [
+                "chargePortColdWeatherMode"
+              ]
+            },
+            "optionalChargeCurrentRequest": {
+              "oneof": [
+                "chargeCurrentRequest"
+              ]
+            },
+            "optionalChargeCurrentRequestMax": {
+              "oneof": [
+                "chargeCurrentRequestMax"
+              ]
+            },
+            "optionalManagedChargingActive": {
+              "oneof": [
+                "managedChargingActive"
+              ]
+            },
+            "optionalManagedChargingUserCanceled": {
+              "oneof": [
+                "managedChargingUserCanceled"
+              ]
+            },
+            "optionalManagedChargingStartTime": {
+              "oneof": [
+                "managedChargingStartTime"
+              ]
+            },
+            "optionalOffPeakHoursEndTime": {
+              "oneof": [
+                "offPeakHoursEndTime"
+              ]
+            },
+            "optionalScheduledChargingMode": {
+              "oneof": [
+                "scheduledChargingMode"
+              ]
+            },
+            "optionalChargingAmps": {
+              "oneof": [
+                "chargingAmps"
+              ]
+            },
+            "optionalScheduledChargingStartTimeMinutes": {
+              "oneof": [
+                "scheduledChargingStartTimeMinutes"
+              ]
+            },
+            "optionalScheduledDepartureTimeMinutes": {
+              "oneof": [
+                "scheduledDepartureTimeMinutes"
+              ]
+            },
+            "optionalPreconditioningEnabled": {
+              "oneof": [
+                "preconditioningEnabled"
+              ]
+            },
+            "optionalScheduledChargingStartTimeApp": {
+              "oneof": [
+                "scheduledChargingStartTimeApp"
+              ]
+            },
+            "optionalSuperchargerSessionTripPlanner": {
+              "oneof": [
+                "superchargerSessionTripPlanner"
+              ]
+            },
+            "optionalChargePortColor": {
+              "oneof": [
+                "chargePortColor"
+              ]
+            },
+            "optionalChargeRateMphFloat": {
+              "oneof": [
+                "chargeRateMphFloat"
+              ]
+            },
+            "optionalChargeLimitReason": {
+              "oneof": [
+                "chargeLimitReason"
+              ]
+            },
+            "optionalChargeCableUnlatched": {
+              "oneof": [
+                "chargeCableUnlatched"
+              ]
+            },
+            "optionalOutletState": {
+              "oneof": [
+                "outletState"
+              ]
+            },
+            "optionalPowerFeedState": {
+              "oneof": [
+                "powerFeedState"
+              ]
+            },
+            "optionOutletSocLimit": {
+              "oneof": [
+                "outletSocLimit"
+              ]
+            },
+            "optionPowerFeedSocLimit": {
+              "oneof": [
+                "powerFeedSocLimit"
+              ]
+            },
+            "optionOutletTimeRemaining": {
+              "oneof": [
+                "outletTimeRemaining"
+              ]
+            },
+            "optionPowerFeedTimeRemaining": {
+              "oneof": [
+                "powerFeedTimeRemaining"
+              ]
+            },
+            "optionalPowershareFeatureAllowed": {
+              "oneof": [
+                "powershareFeatureAllowed"
+              ]
+            },
+            "optionalPowershareFeatureEnabled": {
+              "oneof": [
+                "powershareFeatureEnabled"
+              ]
+            },
+            "optionalPowershareRequest": {
+              "oneof": [
+                "powershareRequest"
+              ]
+            },
+            "optionalPowershareType": {
+              "oneof": [
+                "powershareType"
+              ]
+            },
+            "optionalPowershareStatus": {
+              "oneof": [
+                "powershareStatus"
+              ]
+            },
+            "optionalPowershareStopReason": {
+              "oneof": [
+                "powershareStopReason"
+              ]
+            },
+            "optionalPowershareInstantaneousLoadKw": {
+              "oneof": [
+                "powershareInstantaneousLoadKw"
+              ]
+            },
+            "optionalPowershareVehicleEnergyLeftHr": {
+              "oneof": [
+                "powershareVehicleEnergyLeftHr"
+              ]
+            },
+            "optionalPowershareSocLimit": {
+              "oneof": [
+                "powershareSocLimit"
+              ]
+            },
+            "optionalOneTimeSocLimit": {
+              "oneof": [
+                "oneTimeSocLimit"
+              ]
+            },
+            "optionalHomeLocation": {
+              "oneof": [
+                "homeLocation"
+              ]
+            },
+            "optionalWorkLocation": {
+              "oneof": [
+                "workLocation"
+              ]
+            },
+            "optionalOutletMaxTimerMinutes": {
+              "oneof": [
+                "outletMaxTimerMinutes"
+              ]
+            }
+          },
+          "fields": {
+            "chargingState": {
+              "type": "ChargingState",
+              "id": 1
+            },
+            "fastChargerType": {
+              "type": "ChargerType",
+              "id": 2
+            },
+            "fastChargerBrand": {
+              "type": "ChargerBrand",
+              "id": 3
+            },
+            "chargeLimitSoc": {
+              "type": "int32",
+              "id": 104
+            },
+            "chargeLimitSocStd": {
+              "type": "int32",
+              "id": 105
+            },
+            "chargeLimitSocMin": {
+              "type": "int32",
+              "id": 106
+            },
+            "chargeLimitSocMax": {
+              "type": "int32",
+              "id": 107
+            },
+            "maxRangeChargeCounter": {
+              "type": "int32",
+              "id": 109
+            },
+            "fastChargerPresent": {
+              "type": "bool",
+              "id": 110
+            },
+            "batteryRange": {
+              "type": "float",
+              "id": 111
+            },
+            "estBatteryRange": {
+              "type": "float",
+              "id": 112
+            },
+            "idealBatteryRange": {
+              "type": "float",
+              "id": 113
+            },
+            "batteryLevel": {
+              "type": "int32",
+              "id": 114
+            },
+            "usableBatteryLevel": {
+              "type": "int32",
+              "id": 115
+            },
+            "chargeEnergyAdded": {
+              "type": "float",
+              "id": 116
+            },
+            "chargeMilesAddedRated": {
+              "type": "float",
+              "id": 117
+            },
+            "chargeMilesAddedIdeal": {
+              "type": "float",
+              "id": 118
+            },
+            "chargerVoltage": {
+              "type": "int32",
+              "id": 119
+            },
+            "chargerPilotCurrent": {
+              "type": "int32",
+              "id": 120
+            },
+            "chargerActualCurrent": {
+              "type": "int32",
+              "id": 121
+            },
+            "chargerPower": {
+              "type": "int32",
+              "id": 122
+            },
+            "minutesToFullCharge": {
+              "type": "int32",
+              "id": 123
+            },
+            "minutesToChargeLimit": {
+              "type": "int32",
+              "id": 142
+            },
+            "tripCharging": {
+              "type": "bool",
+              "id": 125
+            },
+            "chargeRateMph": {
+              "type": "int32",
+              "id": 126
+            },
+            "chargePortDoorOpen": {
+              "type": "bool",
+              "id": 127
+            },
+            "connChargeCable": {
+              "type": "CableType",
+              "id": 28
+            },
+            "scheduledChargingStartTime": {
+              "type": "uint64",
+              "id": 129
+            },
+            "scheduledChargingPending": {
+              "type": "bool",
+              "id": 130
+            },
+            "scheduledDepartureTime": {
+              "type": "google.protobuf.Timestamp",
+              "id": 31
+            },
+            "userChargeEnableRequest": {
+              "type": "bool",
+              "id": 132
+            },
+            "chargeEnableRequest": {
+              "type": "bool",
+              "id": 133
+            },
+            "chargerPhases": {
+              "type": "int32",
+              "id": 134
+            },
+            "chargePortLatch": {
+              "type": "ChargePortLatchState",
+              "id": 35
+            },
+            "chargePortColdWeatherMode": {
+              "type": "bool",
+              "id": 136
+            },
+            "chargeCurrentRequest": {
+              "type": "int32",
+              "id": 137
+            },
+            "chargeCurrentRequestMax": {
+              "type": "int32",
+              "id": 138
+            },
+            "managedChargingActive": {
+              "type": "bool",
+              "id": 139
+            },
+            "managedChargingUserCanceled": {
+              "type": "bool",
+              "id": 140
+            },
+            "managedChargingStartTime": {
+              "type": "uint64",
+              "id": 141
+            },
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 44
+            },
+            "preconditioningTimes": {
+              "type": "PreconditioningTimes",
+              "id": 45
+            },
+            "offPeakChargingTimes": {
+              "type": "OffPeakChargingTimes",
+              "id": 46
+            },
+            "offPeakHoursEndTime": {
+              "type": "uint32",
+              "id": 147
+            },
+            "scheduledChargingMode": {
+              "type": "ScheduledChargingMode",
+              "id": 148
+            },
+            "chargingAmps": {
+              "type": "int32",
+              "id": 149
+            },
+            "scheduledChargingStartTimeMinutes": {
+              "type": "uint32",
+              "id": 150
+            },
+            "scheduledDepartureTimeMinutes": {
+              "type": "uint32",
+              "id": 151
+            },
+            "preconditioningEnabled": {
+              "type": "bool",
+              "id": 152
+            },
+            "scheduledChargingStartTimeApp": {
+              "type": "sint32",
+              "id": 153
+            },
+            "superchargerSessionTripPlanner": {
+              "type": "bool",
+              "id": 154
+            },
+            "chargePortColor": {
+              "type": "ChargePortColor_E",
+              "id": 155
+            },
+            "chargeRateMphFloat": {
+              "type": "float",
+              "id": 156
+            },
+            "chargeLimitReason": {
+              "type": "ChargeLimitReason",
+              "id": 157
+            },
+            "managedChargingState": {
+              "type": "ManagedChargingState",
+              "id": 158
+            },
+            "chargeCableUnlatched": {
+              "type": "bool",
+              "id": 159
+            },
+            "outletState": {
+              "type": "OutletState",
+              "id": 160
+            },
+            "powerFeedState": {
+              "type": "PowerFeedState",
+              "id": 161
+            },
+            "outletSocLimit": {
+              "type": "int32",
+              "id": 162
+            },
+            "powerFeedSocLimit": {
+              "type": "int32",
+              "id": 163
+            },
+            "outletTimeRemaining": {
+              "type": "int64",
+              "id": 164
+            },
+            "powerFeedTimeRemaining": {
+              "type": "int64",
+              "id": 165
+            },
+            "powershareFeatureAllowed": {
+              "type": "bool",
+              "id": 166
+            },
+            "powershareFeatureEnabled": {
+              "type": "bool",
+              "id": 167
+            },
+            "powershareRequest": {
+              "type": "bool",
+              "id": 168
+            },
+            "powershareType": {
+              "type": "PowershareType",
+              "id": 169
+            },
+            "powershareStatus": {
+              "type": "PowershareStatus",
+              "id": 170
+            },
+            "powershareStopReason": {
+              "type": "PowershareStopReason",
+              "id": 171
+            },
+            "powershareInstantaneousLoadKw": {
+              "type": "float",
+              "id": 172
+            },
+            "powershareVehicleEnergyLeftHr": {
+              "type": "int32",
+              "id": 173
+            },
+            "powershareSocLimit": {
+              "type": "int32",
+              "id": 174
+            },
+            "oneTimeSocLimit": {
+              "type": "int32",
+              "id": 175
+            },
+            "homeLocation": {
+              "type": "LatLong",
+              "id": 176
+            },
+            "workLocation": {
+              "type": "LatLong",
+              "id": 177
+            },
+            "outletMaxTimerMinutes": {
+              "type": "int32",
+              "id": 178
+            }
+          },
+          "reserved": [
+            [
+              8,
+              8
+            ],
+            [
+              42,
+              42
+            ],
+            [
+              43,
+              43
+            ]
+          ],
+          "nested": {
+            "CableType": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "SNA",
+                    "IEC",
+                    "SAE",
+                    "GB_AC",
+                    "GB_DC"
+                  ]
+                }
+              },
+              "fields": {
+                "SNA": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "IEC": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "SAE": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "GB_AC": {
+                  "type": "Void",
+                  "id": 4
+                },
+                "GB_DC": {
+                  "type": "Void",
+                  "id": 5
+                }
+              }
+            },
+            "ChargerType": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "SNA",
+                    "Supercharger",
+                    "Chademo",
+                    "Gb",
+                    "ACSingleWireCAN",
+                    "Combo",
+                    "MCSingleWireCAN",
+                    "Other",
+                    "Tesla"
+                  ]
+                }
+              },
+              "fields": {
+                "SNA": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "Supercharger": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "Chademo": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "Gb": {
+                  "type": "Void",
+                  "id": 4
+                },
+                "ACSingleWireCAN": {
+                  "type": "Void",
+                  "id": 5
+                },
+                "Combo": {
+                  "type": "Void",
+                  "id": 6
+                },
+                "MCSingleWireCAN": {
+                  "type": "Void",
+                  "id": 7
+                },
+                "Other": {
+                  "type": "Void",
+                  "id": 8
+                },
+                "Tesla": {
+                  "type": "Void",
+                  "id": 9
+                }
+              }
+            },
+            "ChargingState": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "Unknown",
+                    "Disconnected",
+                    "NoPower",
+                    "Starting",
+                    "Charging",
+                    "Complete",
+                    "Stopped",
+                    "Calibrating"
+                  ]
+                }
+              },
+              "fields": {
+                "Unknown": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "Disconnected": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "NoPower": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "Starting": {
+                  "type": "Void",
+                  "id": 4
+                },
+                "Charging": {
+                  "type": "Void",
+                  "id": 5
+                },
+                "Complete": {
+                  "type": "Void",
+                  "id": 6
+                },
+                "Stopped": {
+                  "type": "Void",
+                  "id": 7
+                },
+                "Calibrating": {
+                  "type": "Void",
+                  "id": 8
+                }
+              }
+            },
+            "ChargerBrand": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "Tesla",
+                    "SNA"
+                  ]
+                }
+              },
+              "fields": {
+                "Tesla": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "SNA": {
+                  "type": "Void",
+                  "id": 2
+                }
+              }
+            },
+            "ScheduledChargingMode": {
+              "values": {
+                "ScheduledChargingModeOff": 0,
+                "ScheduledChargingModeStartAt": 1,
+                "ScheduledChargingModeDepartBy": 2
+              }
+            },
+            "ChargePortColor_E": {
+              "values": {
+                "ChargePortColorOff": 0,
+                "ChargePortColorRed": 1,
+                "ChargePortColorGreen": 2,
+                "ChargePortColorBlue": 3,
+                "ChargePortColorWhite": 4,
+                "ChargePortColorFlashingGreen": 5,
+                "ChargePortColorFlashingAmber": 6,
+                "ChargePortColorAmber": 7,
+                "ChargePortColorRave": 8,
+                "ChargePortColorDebug": 9,
+                "ChargePortColorFlashingBlue": 10
+              }
+            },
+            "ChargeLimitReason": {
+              "values": {
+                "ChargeLimitReasonUnknown": 0,
+                "ChargeLimitReasonNone": 1,
+                "ChargeLimitReasonEvse": 2,
+                "ChargeLimitReasonBattTempLow": 3,
+                "ChargeLimitReasonHighSoc": 4,
+                "ChargeLimitReasonCabin": 5
+              }
+            },
+            "OutletState": {
+              "values": {
+                "OutletStateOff": 0,
+                "OutletStateCabinAndBed": 1,
+                "OutletStateCabin": 2
+              }
+            },
+            "PowerFeedState": {
+              "values": {
+                "PowerFeedStateOff": 0,
+                "PowerFeedStateCabinAndBed": 1,
+                "PowerFeedStateCabin": 2
+              }
+            },
+            "PowershareStatus": {
+              "values": {
+                "PowershareStatusInactive": 0,
+                "PowershareStatusInit": 1,
+                "PowershareStatusActive": 2,
+                "PowershareStatusStopped": 3,
+                "PowershareStatusHandshaking": 4,
+                "PowershareStatusActiveReconnectingSoon": 5
+              }
+            },
+            "PowershareType": {
+              "values": {
+                "PowershareTypeNone": 0,
+                "PowershareTypeLoad": 1,
+                "PowershareTypeHome": 2
+              }
+            },
+            "PowershareStopReason": {
+              "values": {
+                "PowershareStopReasonNone": 0,
+                "PowershareStopReasonSOCTooLow": 1,
+                "PowershareStopReasonRetry": 2,
+                "PowershareStopReasonFault": 3,
+                "PowershareStopReasonUser": 4,
+                "PowershareStopReasonReconnecting": 5,
+                "PowershareStopReasonAuthentication": 6
+              }
+            }
+          }
+        },
+        "ManagedChargingState": {
+          "oneofs": {
+            "optionalChargeOnSolarGatewayDin": {
+              "oneof": [
+                "chargeOnSolarGatewayDin"
+              ]
+            },
+            "optionalTeslaElectricAssetId": {
+              "oneof": [
+                "teslaElectricAssetId"
+              ]
+            },
+            "optionalMinutesToLowerLimit": {
+              "oneof": [
+                "minutesToLowerLimit"
+              ]
+            }
+          },
+          "fields": {
+            "chargeOnSolarState": {
+              "type": "ChargeOnSolarState",
+              "id": 1
+            },
+            "chargeOnSolarGatewayDin": {
+              "type": "string",
+              "id": 2
+            },
+            "teslaElectricAssetId": {
+              "type": "string",
+              "id": 3
+            },
+            "minutesToLowerLimit": {
+              "type": "int32",
+              "id": 4
+            }
+          }
+        },
+        "ChargeOnSolarState": {
+          "oneofs": {
+            "state": {
+              "oneof": [
+                "notAllowed",
+                "noChargeRecommended",
+                "chargingOnExcessSolar",
+                "chargingOnAnything",
+                "userDisabled",
+                "waitingForServer",
+                "error",
+                "userStopped"
+              ]
+            }
+          },
+          "fields": {
+            "notAllowed": {
+              "type": "ChargeOnSolarStateNotAllowed",
+              "id": 1
+            },
+            "noChargeRecommended": {
+              "type": "ChargeOnSolarStateNoChargeRecommended",
+              "id": 2
+            },
+            "chargingOnExcessSolar": {
+              "type": "ChargeOnSolarStateChargingOnExcessSolar",
+              "id": 3
+            },
+            "chargingOnAnything": {
+              "type": "ChargeOnSolarStateChargingOnAnything",
+              "id": 4
+            },
+            "userDisabled": {
+              "type": "ChargeOnSolarStateUserDisabled",
+              "id": 6
+            },
+            "waitingForServer": {
+              "type": "ChargeOnSolarStateWaitingForServer",
+              "id": 7
+            },
+            "error": {
+              "type": "ChargeOnSolarStateError",
+              "id": 8
+            },
+            "userStopped": {
+              "type": "ChargeOnSolarStateUserStopped",
+              "id": 9
+            }
+          },
+          "reserved": [
+            [
+              5,
+              5
+            ]
+          ]
+        },
+        "ChargeOnSolarStateNotAllowed": {
+          "fields": {}
+        },
+        "ChargeOnSolarStateNoChargeRecommended": {
+          "fields": {
+            "reason": {
+              "type": "ManagedCharging.ChargeOnSolarNoChargeReason",
+              "id": 1
+            }
+          }
+        },
+        "ChargeOnSolarStateChargingOnExcessSolar": {
+          "fields": {}
+        },
+        "ChargeOnSolarStateChargingOnAnything": {
+          "fields": {}
+        },
+        "ChargeOnSolarStateUserDisabled": {
+          "fields": {}
+        },
+        "ChargeOnSolarStateWaitingForServer": {
+          "fields": {}
+        },
+        "ChargeOnSolarStateError": {
+          "fields": {}
+        },
+        "ChargeOnSolarStateUserStopped": {
+          "fields": {}
+        },
+        "LocationState": {
+          "oneofs": {
+            "optionalLatitude": {
+              "oneof": [
+                "latitude"
+              ]
+            },
+            "optionalLongitude": {
+              "oneof": [
+                "longitude"
+              ]
+            },
+            "optionalHeading": {
+              "oneof": [
+                "heading"
+              ]
+            },
+            "optionalGpsAsOf": {
+              "oneof": [
+                "gpsAsOf"
+              ]
+            },
+            "optionalNativeLocationSupported": {
+              "oneof": [
+                "nativeLocationSupported"
+              ]
+            },
+            "optionalNativeLatitude": {
+              "oneof": [
+                "nativeLatitude"
+              ]
+            },
+            "optionalNativeLongitude": {
+              "oneof": [
+                "nativeLongitude"
+              ]
+            },
+            "optionalCorrectedLatitude": {
+              "oneof": [
+                "correctedLatitude"
+              ]
+            },
+            "optionalCorrectedLongitude": {
+              "oneof": [
+                "correctedLongitude"
+              ]
+            },
+            "optionalHomelinkNearby": {
+              "oneof": [
+                "homelinkNearby"
+              ]
+            },
+            "optionalLocationName": {
+              "oneof": [
+                "locationName"
+              ]
+            },
+            "optionalGeoLatitude": {
+              "oneof": [
+                "geoLatitude"
+              ]
+            },
+            "optionalGeoLongitude": {
+              "oneof": [
+                "geoLongitude"
+              ]
+            },
+            "optionalGeoHeading": {
+              "oneof": [
+                "geoHeading"
+              ]
+            },
+            "optionalGeoElevation": {
+              "oneof": [
+                "geoElevation"
+              ]
+            },
+            "optionalGeoAccuracy": {
+              "oneof": [
+                "geoAccuracy"
+              ]
+            },
+            "optionalEstimatedGpsValid": {
+              "oneof": [
+                "estimatedGpsValid"
+              ]
+            },
+            "optionalEstimatedToRawDistance": {
+              "oneof": [
+                "estimatedToRawDistance"
+              ]
+            }
+          },
+          "fields": {
+            "latitude": {
+              "type": "float",
+              "id": 101
+            },
+            "longitude": {
+              "type": "float",
+              "id": 102
+            },
+            "heading": {
+              "type": "uint32",
+              "id": 103
+            },
+            "gpsAsOf": {
+              "type": "uint64",
+              "id": 104
+            },
+            "nativeLocationSupported": {
+              "type": "bool",
+              "id": 105
+            },
+            "nativeLatitude": {
+              "type": "float",
+              "id": 106
+            },
+            "nativeLongitude": {
+              "type": "float",
+              "id": 107
+            },
+            "nativeType": {
+              "type": "GPSCoordinateType",
+              "id": 8
+            },
+            "correctedLatitude": {
+              "type": "float",
+              "id": 109
+            },
+            "correctedLongitude": {
+              "type": "float",
+              "id": 110
+            },
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 11
+            },
+            "homelinkNearby": {
+              "type": "bool",
+              "id": 112
+            },
+            "locationName": {
+              "type": "string",
+              "id": 113
+            },
+            "geoLatitude": {
+              "type": "float",
+              "id": 114
+            },
+            "geoLongitude": {
+              "type": "float",
+              "id": 115
+            },
+            "geoHeading": {
+              "type": "float",
+              "id": 116
+            },
+            "geoElevation": {
+              "type": "float",
+              "id": 117
+            },
+            "geoAccuracy": {
+              "type": "float",
+              "id": 118
+            },
+            "estimatedGpsValid": {
+              "type": "bool",
+              "id": 119
+            },
+            "estimatedToRawDistance": {
+              "type": "float",
+              "id": 120
+            }
+          },
+          "reserved": [
+            [
+              12,
+              12
+            ]
+          ],
+          "nested": {
+            "GPSCoordinateType": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "GCJ",
+                    "WGS"
+                  ]
+                }
+              },
+              "fields": {
+                "GCJ": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "WGS": {
+                  "type": "Void",
+                  "id": 2
+                }
+              }
+            }
+          }
+        },
+        "VehicleState": {
+          "fields": {
+            "guestMode": {
+              "type": "GuestMode",
+              "id": 74
+            }
+          },
+          "nested": {
+            "GuestMode": {
+              "fields": {
+                "GuestModeActive": {
+                  "type": "bool",
+                  "id": 1
+                }
+              }
+            }
+          }
+        },
+        "ClimateState": {
+          "oneofs": {
+            "optionalInsideTempCelsius": {
+              "oneof": [
+                "insideTempCelsius"
+              ]
+            },
+            "optionalOutsideTempCelsius": {
+              "oneof": [
+                "outsideTempCelsius"
+              ]
+            },
+            "optionalDriverTempSetting": {
+              "oneof": [
+                "driverTempSetting"
+              ]
+            },
+            "optionalPassengerTempSetting": {
+              "oneof": [
+                "passengerTempSetting"
+              ]
+            },
+            "optionalLeftTempDirection": {
+              "oneof": [
+                "leftTempDirection"
+              ]
+            },
+            "optionalRightTempDirection": {
+              "oneof": [
+                "rightTempDirection"
+              ]
+            },
+            "optionalIsFrontDefrosterOn": {
+              "oneof": [
+                "isFrontDefrosterOn"
+              ]
+            },
+            "optionalIsRearDefrosterOn": {
+              "oneof": [
+                "isRearDefrosterOn"
+              ]
+            },
+            "optionalFanStatus": {
+              "oneof": [
+                "fanStatus"
+              ]
+            },
+            "optionalIsClimateOn": {
+              "oneof": [
+                "isClimateOn"
+              ]
+            },
+            "optionalMinAvailTempCelsius": {
+              "oneof": [
+                "minAvailTempCelsius"
+              ]
+            },
+            "optionalMaxAvailTempCelsius": {
+              "oneof": [
+                "maxAvailTempCelsius"
+              ]
+            },
+            "optionalSeatHeaterLeft": {
+              "oneof": [
+                "seatHeaterLeft"
+              ]
+            },
+            "optionalSeatHeaterRight": {
+              "oneof": [
+                "seatHeaterRight"
+              ]
+            },
+            "optionalSeatHeaterRearLeft": {
+              "oneof": [
+                "seatHeaterRearLeft"
+              ]
+            },
+            "optionalSeatHeaterRearRight": {
+              "oneof": [
+                "seatHeaterRearRight"
+              ]
+            },
+            "optionalSeatHeaterRearCenter": {
+              "oneof": [
+                "seatHeaterRearCenter"
+              ]
+            },
+            "optionalSeatHeaterRearRightBack": {
+              "oneof": [
+                "seatHeaterRearRightBack"
+              ]
+            },
+            "optionalSeatHeaterRearLeftBack": {
+              "oneof": [
+                "seatHeaterRearLeftBack"
+              ]
+            },
+            "optionalSeatHeaterThirdRowRight": {
+              "oneof": [
+                "seatHeaterThirdRowRight"
+              ]
+            },
+            "optionalSeatHeaterThirdRowLeft": {
+              "oneof": [
+                "seatHeaterThirdRowLeft"
+              ]
+            },
+            "optionalBatteryHeater": {
+              "oneof": [
+                "batteryHeater"
+              ]
+            },
+            "optionalBatteryHeaterNoPower": {
+              "oneof": [
+                "batteryHeaterNoPower"
+              ]
+            },
+            "optionalSteeringWheelHeater": {
+              "oneof": [
+                "steeringWheelHeater"
+              ]
+            },
+            "optionalWiperBladeHeater": {
+              "oneof": [
+                "wiperBladeHeater"
+              ]
+            },
+            "optionalSideMirrorHeaters": {
+              "oneof": [
+                "sideMirrorHeaters"
+              ]
+            },
+            "optionalIsPreconditioning": {
+              "oneof": [
+                "isPreconditioning"
+              ]
+            },
+            "optionalRemoteHeaterControlEnabled": {
+              "oneof": [
+                "remoteHeaterControlEnabled"
+              ]
+            },
+            "optionalBioweaponModeOn": {
+              "oneof": [
+                "bioweaponModeOn"
+              ]
+            },
+            "optionalIsAutoConditioningOn": {
+              "oneof": [
+                "isAutoConditioningOn"
+              ]
+            },
+            "optionalAutoSeatClimateLeft": {
+              "oneof": [
+                "autoSeatClimateLeft"
+              ]
+            },
+            "optionalAutoSeatClimateRight": {
+              "oneof": [
+                "autoSeatClimateRight"
+              ]
+            },
+            "optionalSeatFanFrontLeft": {
+              "oneof": [
+                "seatFanFrontLeft"
+              ]
+            },
+            "optionalSeatFanFrontRight": {
+              "oneof": [
+                "seatFanFrontRight"
+              ]
+            },
+            "optionalAllowCabinOverheatProtection": {
+              "oneof": [
+                "allowCabinOverheatProtection"
+              ]
+            },
+            "optionalSupportsFanOnlyCabinOverheatProtection": {
+              "oneof": [
+                "supportsFanOnlyCabinOverheatProtection"
+              ]
+            },
+            "optionalCabinOverheatProtection": {
+              "oneof": [
+                "cabinOverheatProtection"
+              ]
+            },
+            "optionalCabinOverheatProtectionActivelyCooling": {
+              "oneof": [
+                "cabinOverheatProtectionActivelyCooling"
+              ]
+            },
+            "optionalCopActivationTemperature": {
+              "oneof": [
+                "copActivationTemperature"
+              ]
+            },
+            "optionalAutoSteeringWheelHeat": {
+              "oneof": [
+                "autoSteeringWheelHeat"
+              ]
+            },
+            "optionalSteeringWheelHeatLevel": {
+              "oneof": [
+                "steeringWheelHeatLevel"
+              ]
+            },
+            "optionalHvacAutoRequest": {
+              "oneof": [
+                "hvacAutoRequest"
+              ]
+            },
+            "optionalCopNotRunningReason": {
+              "oneof": [
+                "copNotRunningReason"
+              ]
+            }
+          },
+          "fields": {
+            "insideTempCelsius": {
+              "type": "float",
+              "id": 101
+            },
+            "outsideTempCelsius": {
+              "type": "float",
+              "id": 102
+            },
+            "driverTempSetting": {
+              "type": "float",
+              "id": 103
+            },
+            "passengerTempSetting": {
+              "type": "float",
+              "id": 104
+            },
+            "leftTempDirection": {
+              "type": "int32",
+              "id": 105
+            },
+            "rightTempDirection": {
+              "type": "int32",
+              "id": 106
+            },
+            "isFrontDefrosterOn": {
+              "type": "bool",
+              "id": 107
+            },
+            "isRearDefrosterOn": {
+              "type": "bool",
+              "id": 108
+            },
+            "fanStatus": {
+              "type": "int32",
+              "id": 109
+            },
+            "isClimateOn": {
+              "type": "bool",
+              "id": 110
+            },
+            "minAvailTempCelsius": {
+              "type": "float",
+              "id": 111
+            },
+            "maxAvailTempCelsius": {
+              "type": "float",
+              "id": 112
+            },
+            "seatHeaterLeft": {
+              "type": "int32",
+              "id": 113
+            },
+            "seatHeaterRight": {
+              "type": "int32",
+              "id": 114
+            },
+            "seatHeaterRearLeft": {
+              "type": "int32",
+              "id": 115
+            },
+            "seatHeaterRearRight": {
+              "type": "int32",
+              "id": 116
+            },
+            "seatHeaterRearCenter": {
+              "type": "int32",
+              "id": 117
+            },
+            "seatHeaterRearRightBack": {
+              "type": "int32",
+              "id": 118
+            },
+            "seatHeaterRearLeftBack": {
+              "type": "int32",
+              "id": 119
+            },
+            "seatHeaterThirdRowRight": {
+              "type": "int32",
+              "id": 120
+            },
+            "seatHeaterThirdRowLeft": {
+              "type": "int32",
+              "id": 121
+            },
+            "batteryHeater": {
+              "type": "bool",
+              "id": 122
+            },
+            "batteryHeaterNoPower": {
+              "type": "bool",
+              "id": 123
+            },
+            "steeringWheelHeater": {
+              "type": "bool",
+              "id": 125
+            },
+            "wiperBladeHeater": {
+              "type": "bool",
+              "id": 126
+            },
+            "sideMirrorHeaters": {
+              "type": "bool",
+              "id": 127
+            },
+            "isPreconditioning": {
+              "type": "bool",
+              "id": 128
+            },
+            "remoteHeaterControlEnabled": {
+              "type": "bool",
+              "id": 129
+            },
+            "climateKeeperMode": {
+              "type": "ClimateKeeperMode",
+              "id": 30
+            },
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 33
+            },
+            "bioweaponModeOn": {
+              "type": "bool",
+              "id": 134
+            },
+            "defrostMode": {
+              "type": "DefrostMode",
+              "id": 35
+            },
+            "isAutoConditioningOn": {
+              "type": "bool",
+              "id": 136
+            },
+            "autoSeatClimateLeft": {
+              "type": "bool",
+              "id": 137
+            },
+            "autoSeatClimateRight": {
+              "type": "bool",
+              "id": 138
+            },
+            "seatFanFrontLeft": {
+              "type": "int32",
+              "id": 139
+            },
+            "seatFanFrontRight": {
+              "type": "int32",
+              "id": 140
+            },
+            "allowCabinOverheatProtection": {
+              "type": "bool",
+              "id": 141
+            },
+            "supportsFanOnlyCabinOverheatProtection": {
+              "type": "bool",
+              "id": 142
+            },
+            "cabinOverheatProtection": {
+              "type": "CabinOverheatProtection_E",
+              "id": 143
+            },
+            "cabinOverheatProtectionActivelyCooling": {
+              "type": "bool",
+              "id": 144
+            },
+            "copActivationTemperature": {
+              "type": "CopActivationTemp",
+              "id": 146
+            },
+            "autoSteeringWheelHeat": {
+              "type": "bool",
+              "id": 147
+            },
+            "steeringWheelHeatLevel": {
+              "type": "StwHeatLevel",
+              "id": 148
+            },
+            "hvacAutoRequest": {
+              "type": "HvacAutoRequest",
+              "id": 150
+            },
+            "copNotRunningReason": {
+              "type": "COPNotRunningReason",
+              "id": 151
+            }
+          },
+          "reserved": [
+            [
+              145,
+              145
+            ]
+          ],
+          "nested": {
+            "ClimateKeeperMode": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "Unknown",
+                    "Off",
+                    "On",
+                    "Dog",
+                    "Party"
+                  ]
+                }
+              },
+              "fields": {
+                "Unknown": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "Off": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "On": {
+                  "type": "Void",
+                  "id": 3
+                },
+                "Dog": {
+                  "type": "Void",
+                  "id": 4
+                },
+                "Party": {
+                  "type": "Void",
+                  "id": 5
+                }
+              }
+            },
+            "DefrostMode": {
+              "oneofs": {
+                "type": {
+                  "oneof": [
+                    "Off",
+                    "Normal",
+                    "Max"
+                  ]
+                }
+              },
+              "fields": {
+                "Off": {
+                  "type": "Void",
+                  "id": 1
+                },
+                "Normal": {
+                  "type": "Void",
+                  "id": 2
+                },
+                "Max": {
+                  "type": "Void",
+                  "id": 3
+                }
+              }
+            },
+            "HvacAutoRequest": {
+              "values": {
+                "HvacAutoRequestOn": 0,
+                "HvacAutoRequestOverride": 1
+              }
+            },
+            "CabinOverheatProtection_E": {
+              "values": {
+                "CabinOverheatProtectionOff": 0,
+                "CabinOverheatProtectionOn": 1,
+                "CabinOverheatProtectionFanOnly": 2
+              }
+            },
+            "SeatHeaterLevel_E": {
+              "values": {
+                "SeatHeaterLevelOff": 0,
+                "SeatHeaterLevelLow": 1,
+                "SeatHeaterLevelMed": 2,
+                "SeatHeaterLevelHigh": 3
+              }
+            },
+            "SeatCoolingLevel_E": {
+              "values": {
+                "SeatCoolingLevelOff": 0,
+                "SeatCoolingLevelLow": 1,
+                "SeatCoolingLevelMed": 2,
+                "SeatCoolingLevelHigh": 3
+              }
+            },
+            "CopActivationTemp": {
+              "values": {
+                "CopActivationTempUnspecified": 0,
+                "CopActivationTempLow": 1,
+                "CopActivationTempMedium": 2,
+                "CopActivationTempHigh": 3
+              }
+            },
+            "COPNotRunningReason": {
+              "values": {
+                "COPNotRunningReasonNoReason": 0,
+                "COPNotRunningReasonUserInteraction": 1,
+                "COPNotRunningReasonEnergyConsumptionReached": 2,
+                "COPNotRunningReasonTimeout": 3,
+                "COPNotRunningReasonLowSolarLoad": 4,
+                "COPNotRunningReasonFault": 5,
+                "COPNotRunningReasonCabinBelowThreshold": 6
+              }
+            }
+          }
+        },
+        "TirePressureState": {
+          "oneofs": {
+            "optionalTpmsPressureFl": {
+              "oneof": [
+                "tpmsPressureFl"
+              ]
+            },
+            "optionalTpmsPressureFr": {
+              "oneof": [
+                "tpmsPressureFr"
+              ]
+            },
+            "optionalTpmsPressureRl": {
+              "oneof": [
+                "tpmsPressureRl"
+              ]
+            },
+            "optionalTpmsPressureRr": {
+              "oneof": [
+                "tpmsPressureRr"
+              ]
+            },
+            "optionalTpmsHardWarningFl": {
+              "oneof": [
+                "tpmsHardWarningFl"
+              ]
+            },
+            "optionalTpmsHardWarningFr": {
+              "oneof": [
+                "tpmsHardWarningFr"
+              ]
+            },
+            "optionalTpmsHardWarningRl": {
+              "oneof": [
+                "tpmsHardWarningRl"
+              ]
+            },
+            "optionalTpmsHardWarningRr": {
+              "oneof": [
+                "tpmsHardWarningRr"
+              ]
+            },
+            "optionalTpmsSoftWarningFl": {
+              "oneof": [
+                "tpmsSoftWarningFl"
+              ]
+            },
+            "optionalTpmsSoftWarningFr": {
+              "oneof": [
+                "tpmsSoftWarningFr"
+              ]
+            },
+            "optionalTpmsSoftWarningRl": {
+              "oneof": [
+                "tpmsSoftWarningRl"
+              ]
+            },
+            "optionalTpmsSoftWarningRr": {
+              "oneof": [
+                "tpmsSoftWarningRr"
+              ]
+            },
+            "optionalTpmsRcpFrontValue": {
+              "oneof": [
+                "tpmsRcpFrontValue"
+              ]
+            },
+            "optionalTpmsRcpRearValue": {
+              "oneof": [
+                "tpmsRcpRearValue"
+              ]
+            }
+          },
+          "fields": {
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 1
+            },
+            "tpmsPressureFl": {
+              "type": "float",
+              "id": 2
+            },
+            "tpmsPressureFr": {
+              "type": "float",
+              "id": 3
+            },
+            "tpmsPressureRl": {
+              "type": "float",
+              "id": 4
+            },
+            "tpmsPressureRr": {
+              "type": "float",
+              "id": 5
+            },
+            "tpmsLastSeenPressureTimeFl": {
+              "type": "google.protobuf.Timestamp",
+              "id": 6
+            },
+            "tpmsLastSeenPressureTimeFr": {
+              "type": "google.protobuf.Timestamp",
+              "id": 7
+            },
+            "tpmsLastSeenPressureTimeRl": {
+              "type": "google.protobuf.Timestamp",
+              "id": 8
+            },
+            "tpmsLastSeenPressureTimeRr": {
+              "type": "google.protobuf.Timestamp",
+              "id": 9
+            },
+            "tpmsHardWarningFl": {
+              "type": "bool",
+              "id": 10
+            },
+            "tpmsHardWarningFr": {
+              "type": "bool",
+              "id": 11
+            },
+            "tpmsHardWarningRl": {
+              "type": "bool",
+              "id": 12
+            },
+            "tpmsHardWarningRr": {
+              "type": "bool",
+              "id": 13
+            },
+            "tpmsSoftWarningFl": {
+              "type": "bool",
+              "id": 14
+            },
+            "tpmsSoftWarningFr": {
+              "type": "bool",
+              "id": 15
+            },
+            "tpmsSoftWarningRl": {
+              "type": "bool",
+              "id": 16
+            },
+            "tpmsSoftWarningRr": {
+              "type": "bool",
+              "id": 17
+            },
+            "tpmsRcpFrontValue": {
+              "type": "float",
+              "id": 18
+            },
+            "tpmsRcpRearValue": {
+              "type": "float",
+              "id": 19
+            }
+          }
+        },
+        "MediaState": {
+          "oneofs": {
+            "optionalRemoteControlEnabled": {
+              "oneof": [
+                "remoteControlEnabled"
+              ]
+            },
+            "optionalNowPlayingArtist": {
+              "oneof": [
+                "nowPlayingArtist"
+              ]
+            },
+            "optionalNowPlayingTitle": {
+              "oneof": [
+                "nowPlayingTitle"
+              ]
+            },
+            "optionalAudioVolume": {
+              "oneof": [
+                "audioVolume"
+              ]
+            },
+            "optionalAudioVolumeIncrement": {
+              "oneof": [
+                "audioVolumeIncrement"
+              ]
+            },
+            "optionalAudioVolumeMax": {
+              "oneof": [
+                "audioVolumeMax"
+              ]
+            },
+            "optionalNowPlayingSource": {
+              "oneof": [
+                "nowPlayingSource"
+              ]
+            },
+            "optionalMediaPlaybackStatus": {
+              "oneof": [
+                "mediaPlaybackStatus"
+              ]
+            }
+          },
+          "fields": {
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 1
+            },
+            "remoteControlEnabled": {
+              "type": "bool",
+              "id": 2
+            },
+            "nowPlayingArtist": {
+              "type": "string",
+              "id": 3
+            },
+            "nowPlayingTitle": {
+              "type": "string",
+              "id": 4
+            },
+            "audioVolume": {
+              "type": "float",
+              "id": 5
+            },
+            "audioVolumeIncrement": {
+              "type": "float",
+              "id": 6
+            },
+            "audioVolumeMax": {
+              "type": "float",
+              "id": 7
+            },
+            "nowPlayingSource": {
+              "type": "MediaSourceType",
+              "id": 8
+            },
+            "mediaPlaybackStatus": {
+              "type": "MediaPlaybackStatus",
+              "id": 9
+            }
+          }
+        },
+        "MediaDetailState": {
+          "oneofs": {
+            "optionalNowPlayingDuration": {
+              "oneof": [
+                "nowPlayingDuration"
+              ]
+            },
+            "optionalNowPlayingElapsed": {
+              "oneof": [
+                "nowPlayingElapsed"
+              ]
+            },
+            "optionalNowPlayingSourceString": {
+              "oneof": [
+                "nowPlayingSourceString"
+              ]
+            },
+            "optionalNowPlayingAlbum": {
+              "oneof": [
+                "nowPlayingAlbum"
+              ]
+            },
+            "optionalNowPlayingStation": {
+              "oneof": [
+                "nowPlayingStation"
+              ]
+            },
+            "optionalA2dpSourceName": {
+              "oneof": [
+                "a2dpSourceName"
+              ]
+            }
+          },
+          "fields": {
+            "timestamp": {
+              "type": "google.protobuf.Timestamp",
+              "id": 1
+            },
+            "nowPlayingDuration": {
+              "type": "int32",
+              "id": 2
+            },
+            "nowPlayingElapsed": {
+              "type": "int32",
+              "id": 3
+            },
+            "nowPlayingSourceString": {
+              "type": "string",
+              "id": 4
+            },
+            "nowPlayingAlbum": {
+              "type": "string",
+              "id": 5
+            },
+            "nowPlayingStation": {
+              "type": "string",
+              "id": 6
+            },
+            "a2dpSourceName": {
+              "type": "string",
+              "id": 7
+            }
+          }
+        },
+        "ShiftState": {
+          "oneofs": {
+            "type": {
+              "oneof": [
+                "Invalid",
+                "P",
+                "R",
+                "N",
+                "D",
+                "SNA"
+              ]
+            }
+          },
+          "fields": {
+            "Invalid": {
+              "type": "Void",
+              "id": 1
+            },
+            "P": {
+              "type": "Void",
+              "id": 2
+            },
+            "R": {
+              "type": "Void",
+              "id": 3
+            },
+            "N": {
+              "type": "Void",
+              "id": 4
+            },
+            "D": {
+              "type": "Void",
+              "id": 5
+            },
+            "SNA": {
+              "type": "Void",
+              "id": 6
+            }
+          }
+        },
+        "MediaSourceType": {
+          "values": {
+            "MediaSourceType_None": 0,
+            "MediaSourceType_AM": 1,
+            "MediaSourceType_FM": 2,
+            "MediaSourceType_XM": 3,
+            "MediaSourceType_Slacker": 5,
+            "MediaSourceType_LocalFiles": 6,
+            "MediaSourceType_iPod": 7,
+            "MediaSourceType_Bluetooth": 8,
+            "MediaSourceType_AuxIn": 9,
+            "MediaSourceType_DAB": 10,
+            "MediaSourceType_Rdio": 11,
+            "MediaSourceType_Spotify": 12,
+            "MediaSourceType_USRadio": 13,
+            "MediaSourceType_EURadio": 14,
+            "MediaSourceType_MediaFile": 16,
+            "MediaSourceType_TuneIn": 17,
+            "MediaSourceType_Stingray": 18,
+            "MediaSourceType_SiriusXM": 19,
+            "MediaSourceType_Tidal": 20,
+            "MediaSourceType_QQMusic": 21,
+            "MediaSourceType_QQMusic2": 22,
+            "MediaSourceType_Ximalaya": 23,
+            "MediaSourceType_OnlineRadio": 24,
+            "MediaSourceType_OnlineRadio2": 25,
+            "MediaSourceType_NetEaseMusic": 26,
+            "MediaSourceType_Browser": 28,
+            "MediaSourceType_Theater": 29,
+            "MediaSourceType_Game": 30,
+            "MediaSourceType_Tutorial": 31,
+            "MediaSourceType_Toybox": 32,
+            "MediaSourceType_RecentsFavorites": 33,
+            "MediaSourceType_HomeApps": 34,
+            "MediaSourceType_Search": 35
+          }
+        },
+        "Invalid": {
+          "values": {
+            "INVALID": 0
+          }
+        },
+        "Void": {
+          "fields": {}
+        },
+        "LatLong": {
+          "fields": {
+            "latitude": {
+              "type": "float",
+              "id": 1
+            },
+            "longitude": {
+              "type": "float",
+              "id": 2
+            }
+          }
+        },
+        "ChargePortLatchState": {
+          "oneofs": {
+            "type": {
+              "oneof": [
+                "SNA",
+                "Disengaged",
+                "Engaged",
+                "Blocking"
+              ]
+            }
+          },
+          "fields": {
+            "SNA": {
+              "type": "Void",
+              "id": 1
+            },
+            "Disengaged": {
+              "type": "Void",
+              "id": 2
+            },
+            "Engaged": {
+              "type": "Void",
+              "id": 3
+            },
+            "Blocking": {
+              "type": "Void",
+              "id": 4
+            }
+          }
+        },
+        "PreconditioningTimes": {
+          "oneofs": {
+            "times": {
+              "oneof": [
+                "allWeek",
+                "weekdays"
+              ]
+            }
+          },
+          "fields": {
+            "allWeek": {
+              "type": "Void",
+              "id": 1
+            },
+            "weekdays": {
+              "type": "Void",
+              "id": 2
+            }
+          }
+        },
+        "OffPeakChargingTimes": {
+          "oneofs": {
+            "times": {
+              "oneof": [
+                "allWeek",
+                "weekdays"
+              ]
+            }
+          },
+          "fields": {
+            "allWeek": {
+              "type": "Void",
+              "id": 1
+            },
+            "weekdays": {
+              "type": "Void",
+              "id": 2
+            }
+          }
+        },
+        "MediaPlaybackStatus": {
+          "values": {
+            "Stopped": 0,
+            "Playing": 1,
+            "Paused": 2
+          }
+        },
+        "StwHeatLevel": {
+          "values": {
+            "StwHeatLevel_Unknown": 0,
+            "StwHeatLevel_Off": 1,
+            "StwHeatLevel_Low": 2,
+            "StwHeatLevel_High": 3
+          }
+        },
+        "ChargeSchedule": {
+          "fields": {
+            "id": {
+              "type": "uint64",
+              "id": 1
+            },
+            "name": {
+              "type": "string",
+              "id": 2
+            },
+            "daysOfWeek": {
+              "type": "int32",
+              "id": 3
+            },
+            "startEnabled": {
+              "type": "bool",
+              "id": 4
+            },
+            "startTime": {
+              "type": "int32",
+              "id": 5
+            },
+            "endEnabled": {
+              "type": "bool",
+              "id": 6
+            },
+            "endTime": {
+              "type": "int32",
+              "id": 7
+            },
+            "oneTime": {
+              "type": "bool",
+              "id": 8
+            },
+            "enabled": {
+              "type": "bool",
+              "id": 9
+            },
+            "latitude": {
+              "type": "float",
+              "id": 10
+            },
+            "longitude": {
+              "type": "float",
+              "id": 11
+            }
+          }
+        },
+        "PreconditionSchedule": {
+          "fields": {
+            "id": {
+              "type": "uint64",
+              "id": 1
+            },
+            "name": {
+              "type": "string",
+              "id": 2
+            },
+            "daysOfWeek": {
+              "type": "int32",
+              "id": 3
+            },
+            "preconditionTime": {
+              "type": "int32",
+              "id": 4
+            },
+            "oneTime": {
+              "type": "bool",
+              "id": 5
+            },
+            "enabled": {
+              "type": "bool",
+              "id": 6
+            },
+            "latitude": {
+              "type": "float",
+              "id": 7
+            },
+            "longitude": {
+              "type": "float",
+              "id": 8
+            }
+          }
+        }
+      }
+    },
+    "google": {
+      "nested": {
+        "protobuf": {
+          "nested": {
+            "Timestamp": {
+              "fields": {
+                "seconds": {
+                  "type": "int64",
+                  "id": 1
+                },
+                "nanos": {
+                  "type": "int32",
+                  "id": 2
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "VCSEC": {
+      "options": {
+        "java_package": "com.tesla.generated.vcsec",
+        "go_package": "github.com/teslamotors/vehicle-command/pkg/protocol/protobuf/vcsec"
+      },
+      "nested": {
+        "SignatureType": {
+          "values": {
+            "SIGNATURE_TYPE_NONE": 0,
+            "SIGNATURE_TYPE_PRESENT_KEY": 2
+          }
+        },
+        "SignedMessage": {
+          "fields": {
+            "protobufMessageAsBytes": {
+              "type": "bytes",
+              "id": 2
+            },
+            "signatureType": {
+              "type": "SignatureType",
+              "id": 3
+            }
+          }
+        },
+        "ToVCSECMessage": {
+          "fields": {
+            "signedMessage": {
+              "type": "SignedMessage",
+              "id": 1
+            }
+          }
+        },
+        "KeyIdentifier": {
+          "fields": {
+            "publicKeySHA1": {
+              "type": "bytes",
+              "id": 1
+            }
+          }
+        },
+        "KeyFormFactor": {
+          "values": {
+            "KEY_FORM_FACTOR_UNKNOWN": 0,
+            "KEY_FORM_FACTOR_NFC_CARD": 1,
+            "KEY_FORM_FACTOR_IOS_DEVICE": 6,
+            "KEY_FORM_FACTOR_ANDROID_DEVICE": 7,
+            "KEY_FORM_FACTOR_CLOUD_KEY": 9
+          }
+        },
+        "KeyMetadata": {
+          "fields": {
+            "keyFormFactor": {
+              "type": "KeyFormFactor",
+              "id": 1
+            }
+          }
+        },
+        "PublicKey": {
+          "fields": {
+            "PublicKeyRaw": {
+              "type": "bytes",
+              "id": 1
+            }
+          }
+        },
+        "InformationRequestType": {
+          "values": {
+            "INFORMATION_REQUEST_TYPE_GET_STATUS": 0,
+            "INFORMATION_REQUEST_TYPE_GET_WHITELIST_INFO": 5,
+            "INFORMATION_REQUEST_TYPE_GET_WHITELIST_ENTRY_INFO": 6
+          }
+        },
+        "WhitelistInfo": {
+          "fields": {
+            "numberOfEntries": {
+              "type": "uint32",
+              "id": 1
+            },
+            "whitelistEntries": {
+              "rule": "repeated",
+              "type": "KeyIdentifier",
+              "id": 2
+            },
+            "slotMask": {
+              "type": "uint32",
+              "id": 3
+            }
+          }
+        },
+        "WhitelistEntryInfo": {
+          "fields": {
+            "keyId": {
+              "type": "KeyIdentifier",
+              "id": 1
+            },
+            "publicKey": {
+              "type": "PublicKey",
+              "id": 2
+            },
+            "metadataForKey": {
+              "type": "KeyMetadata",
+              "id": 4
+            },
+            "slot": {
+              "type": "uint32",
+              "id": 6
+            },
+            "keyRole": {
+              "type": "Keys.Role",
+              "id": 7
+            }
+          }
+        },
+        "InformationRequest": {
+          "oneofs": {
+            "key": {
+              "oneof": [
+                "keyId",
+                "publicKey",
+                "slot"
+              ]
+            }
+          },
+          "fields": {
+            "informationRequestType": {
+              "type": "InformationRequestType",
+              "id": 1
+            },
+            "keyId": {
+              "type": "KeyIdentifier",
+              "id": 2
+            },
+            "publicKey": {
+              "type": "bytes",
+              "id": 3
+            },
+            "slot": {
+              "type": "uint32",
+              "id": 4
+            }
+          }
+        },
+        "RKEAction_E": {
+          "values": {
+            "RKE_ACTION_UNLOCK": 0,
+            "RKE_ACTION_LOCK": 1,
+            "RKE_ACTION_REMOTE_DRIVE": 20,
+            "RKE_ACTION_AUTO_SECURE_VEHICLE": 29,
+            "RKE_ACTION_WAKE_VEHICLE": 30
+          }
+        },
+        "ClosureMoveType_E": {
+          "values": {
+            "CLOSURE_MOVE_TYPE_NONE": 0,
+            "CLOSURE_MOVE_TYPE_MOVE": 1,
+            "CLOSURE_MOVE_TYPE_STOP": 2,
+            "CLOSURE_MOVE_TYPE_OPEN": 3,
+            "CLOSURE_MOVE_TYPE_CLOSE": 4
+          }
+        },
+        "ClosureMoveRequest": {
+          "fields": {
+            "frontDriverDoor": {
+              "type": "ClosureMoveType_E",
+              "id": 1
+            },
+            "frontPassengerDoor": {
+              "type": "ClosureMoveType_E",
+              "id": 2
+            },
+            "rearDriverDoor": {
+              "type": "ClosureMoveType_E",
+              "id": 3
+            },
+            "rearPassengerDoor": {
+              "type": "ClosureMoveType_E",
+              "id": 4
+            },
+            "rearTrunk": {
+              "type": "ClosureMoveType_E",
+              "id": 5
+            },
+            "frontTrunk": {
+              "type": "ClosureMoveType_E",
+              "id": 6
+            },
+            "chargePort": {
+              "type": "ClosureMoveType_E",
+              "id": 7
+            },
+            "tonneau": {
+              "type": "ClosureMoveType_E",
+              "id": 8
+            }
+          }
+        },
+        "PermissionChange": {
+          "fields": {
+            "key": {
+              "type": "PublicKey",
+              "id": 1
+            },
+            "secondsToBeActive": {
+              "type": "uint32",
+              "id": 3
+            },
+            "keyRole": {
+              "type": "Keys.Role",
+              "id": 4
+            }
+          }
+        },
+        "ReplaceKey": {
+          "oneofs": {
+            "keyToReplace": {
+              "oneof": [
+                "publicKeyToReplace",
+                "slotToReplace"
+              ]
+            }
+          },
+          "fields": {
+            "publicKeyToReplace": {
+              "type": "PublicKey",
+              "id": 1
+            },
+            "slotToReplace": {
+              "type": "uint32",
+              "id": 2
+            },
+            "keyToAdd": {
+              "type": "PublicKey",
+              "id": 3
+            },
+            "keyRole": {
+              "type": "Keys.Role",
+              "id": 4
+            },
+            "impermanent": {
+              "type": "bool",
+              "id": 5
+            }
+          }
+        },
+        "WhitelistOperation": {
+          "oneofs": {
+            "subMessage": {
+              "oneof": [
+                "addPublicKeyToWhitelist",
+                "removePublicKeyFromWhitelist",
+                "addPermissionsToPublicKey",
+                "removePermissionsFromPublicKey",
+                "addKeyToWhitelistAndAddPermissions",
+                "updateKeyAndPermissions",
+                "addImpermanentKey",
+                "addImpermanentKeyAndRemoveExisting",
+                "removeAllImpermanentKeys",
+                "replaceKey"
+              ]
+            }
+          },
+          "fields": {
+            "addPublicKeyToWhitelist": {
+              "type": "PublicKey",
+              "id": 1
+            },
+            "removePublicKeyFromWhitelist": {
+              "type": "PublicKey",
+              "id": 2
+            },
+            "addPermissionsToPublicKey": {
+              "type": "PermissionChange",
+              "id": 3
+            },
+            "removePermissionsFromPublicKey": {
+              "type": "PermissionChange",
+              "id": 4
+            },
+            "addKeyToWhitelistAndAddPermissions": {
+              "type": "PermissionChange",
+              "id": 5
+            },
+            "updateKeyAndPermissions": {
+              "type": "PermissionChange",
+              "id": 7
+            },
+            "addImpermanentKey": {
+              "type": "PermissionChange",
+              "id": 8
+            },
+            "addImpermanentKeyAndRemoveExisting": {
+              "type": "PermissionChange",
+              "id": 9
+            },
+            "removeAllImpermanentKeys": {
+              "type": "bool",
+              "id": 16
+            },
+            "replaceKey": {
+              "type": "ReplaceKey",
+              "id": 17
+            },
+            "metadataForKey": {
+              "type": "KeyMetadata",
+              "id": 6
+            }
+          }
+        },
+        "OperationStatus_E": {
+          "values": {
+            "OPERATIONSTATUS_OK": 0,
+            "OPERATIONSTATUS_WAIT": 1,
+            "OPERATIONSTATUS_ERROR": 2
+          }
+        },
+        "SignedMessage_information_E": {
+          "values": {
+            "SIGNEDMESSAGE_INFORMATION_NONE": 0,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_UNKNOWN": 1,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_NOT_ON_WHITELIST": 2,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_IV_SMALLER_THAN_EXPECTED": 3,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_INVALID_TOKEN": 4,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_TOKEN_AND_COUNTER_INVALID": 5,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_AES_DECRYPT_AUTH": 6,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_ECDSA_INPUT": 7,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_ECDSA_SIGNATURE": 8,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_LOCAL_ENTITY_START": 9,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_LOCAL_ENTITY_RESULT": 10,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_COULD_NOT_RETRIEVE_KEY": 11,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_COULD_NOT_RETRIEVE_TOKEN": 12,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_SIGNATURE_TOO_SHORT": 13,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_TOKEN_IS_INCORRECT_LENGTH": 14,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_INCORRECT_EPOCH": 15,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_IV_INCORRECT_LENGTH": 16,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_TIME_EXPIRED": 17,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_NOT_PROVISIONED_WITH_IDENTITY": 18,
+            "SIGNEDMESSAGE_INFORMATION_FAULT_COULD_NOT_HASH_METADATA": 19
+          }
+        },
+        "WhitelistOperation_information_E": {
+          "values": {
+            "WHITELISTOPERATION_INFORMATION_NONE": 0,
+            "WHITELISTOPERATION_INFORMATION_UNDOCUMENTED_ERROR": 1,
+            "WHITELISTOPERATION_INFORMATION_NO_PERMISSION_TO_REMOVE_ONESELF": 2,
+            "WHITELISTOPERATION_INFORMATION_KEYFOB_SLOTS_FULL": 3,
+            "WHITELISTOPERATION_INFORMATION_WHITELIST_FULL": 4,
+            "WHITELISTOPERATION_INFORMATION_NO_PERMISSION_TO_ADD": 5,
+            "WHITELISTOPERATION_INFORMATION_INVALID_PUBLIC_KEY": 6,
+            "WHITELISTOPERATION_INFORMATION_NO_PERMISSION_TO_REMOVE": 7,
+            "WHITELISTOPERATION_INFORMATION_NO_PERMISSION_TO_CHANGE_PERMISSIONS": 8,
+            "WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_ELEVATE_OTHER_ABOVE_ONESELF": 9,
+            "WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_DEMOTE_SUPERIOR_TO_ONESELF": 10,
+            "WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_REMOVE_OWN_PERMISSIONS": 11,
+            "WHITELISTOPERATION_INFORMATION_PUBLIC_KEY_NOT_ON_WHITELIST": 12,
+            "WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_ADD_KEY_THAT_IS_ALREADY_ON_THE_WHITELIST": 13,
+            "WHITELISTOPERATION_INFORMATION_NOT_ALLOWED_TO_ADD_UNLESS_ON_READER": 14,
+            "WHITELISTOPERATION_INFORMATION_FM_MODIFYING_OUTSIDE_OF_F_MODE": 15,
+            "WHITELISTOPERATION_INFORMATION_FM_ATTEMPTING_TO_ADD_PERMANENT_KEY": 16,
+            "WHITELISTOPERATION_INFORMATION_FM_ATTEMPTING_TO_REMOVE_PERMANENT_KEY": 17,
+            "WHITELISTOPERATION_INFORMATION_KEYCHAIN_WHILE_FS_FULL": 18,
+            "WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_ADD_KEY_WITHOUT_ROLE": 19,
+            "WHITELISTOPERATION_INFORMATION_ATTEMPTING_TO_ADD_KEY_WITH_SERVICE_ROLE": 20,
+            "WHITELISTOPERATION_INFORMATION_NON_SERVICE_KEY_ATTEMPTING_TO_ADD_SERVICE_TECH": 21,
+            "WHITELISTOPERATION_INFORMATION_SERVICE_KEY_ATTEMPTING_TO_ADD_SERVICE_TECH_OUTSIDE_SERVICE_MODE": 22,
+            "WHITELISTOPERATION_INFORMATION_COULD_NOT_START_LOCAL_ENTITY_AUTH": 23,
+            "WHITELISTOPERATION_INFORMATION_LOCAL_ENTITY_AUTH_FAILED_UI_DENIED": 24,
+            "WHITELISTOPERATION_INFORMATION_LOCAL_ENTITY_AUTH_FAILED_TIMED_OUT_WAITING_FOR_TAP": 25,
+            "WHITELISTOPERATION_INFORMATION_LOCAL_ENTITY_AUTH_FAILED_TIMED_OUT_WAITING_FOR_UI_ACK": 26,
+            "WHITELISTOPERATION_INFORMATION_LOCAL_ENTITY_AUTH_FAILED_VALET_MODE": 27,
+            "WHITELISTOPERATION_INFORMATION_LOCAL_ENTITY_AUTH_FAILED_CANCELLED": 28
+          }
+        },
+        "WhitelistOperation_status": {
+          "fields": {
+            "whitelistOperationInformation": {
+              "type": "WhitelistOperation_information_E",
+              "id": 1
+            },
+            "signerOfOperation": {
+              "type": "KeyIdentifier",
+              "id": 2
+            },
+            "operationStatus": {
+              "type": "OperationStatus_E",
+              "id": 3
+            }
+          }
+        },
+        "SignedMessage_status": {
+          "fields": {
+            "counter": {
+              "type": "uint32",
+              "id": 1
+            },
+            "signedMessageInformation": {
+              "type": "SignedMessage_information_E",
+              "id": 2
+            }
+          }
+        },
+        "CommandStatus": {
+          "oneofs": {
+            "subMessage": {
+              "oneof": [
+                "signedMessageStatus",
+                "whitelistOperationStatus"
+              ]
+            }
+          },
+          "fields": {
+            "operationStatus": {
+              "type": "OperationStatus_E",
+              "id": 1
+            },
+            "signedMessageStatus": {
+              "type": "SignedMessage_status",
+              "id": 2
+            },
+            "whitelistOperationStatus": {
+              "type": "WhitelistOperation_status",
+              "id": 3
+            }
+          }
+        },
+        "UnsignedMessage": {
+          "oneofs": {
+            "subMessage": {
+              "oneof": [
+                "InformationRequest",
+                "RKEAction",
+                "closureMoveRequest",
+                "WhitelistOperation"
+              ]
+            }
+          },
+          "fields": {
+            "InformationRequest": {
+              "type": "InformationRequest",
+              "id": 1
+            },
+            "RKEAction": {
+              "type": "RKEAction_E",
+              "id": 2
+            },
+            "closureMoveRequest": {
+              "type": "ClosureMoveRequest",
+              "id": 4
+            },
+            "WhitelistOperation": {
+              "type": "WhitelistOperation",
+              "id": 16
+            }
+          },
+          "reserved": [
+            [
+              6,
+              6
+            ],
+            [
+              7,
+              7
+            ],
+            [
+              10,
+              10
+            ],
+            [
+              12,
+              12
+            ],
+            [
+              13,
+              13
+            ]
+          ]
+        },
+        "ClosureState_E": {
+          "values": {
+            "CLOSURESTATE_CLOSED": 0,
+            "CLOSURESTATE_OPEN": 1,
+            "CLOSURESTATE_AJAR": 2,
+            "CLOSURESTATE_UNKNOWN": 3,
+            "CLOSURESTATE_FAILED_UNLATCH": 4,
+            "CLOSURESTATE_OPENING": 5,
+            "CLOSURESTATE_CLOSING": 6
+          }
+        },
+        "VehicleLockState_E": {
+          "values": {
+            "VEHICLELOCKSTATE_UNLOCKED": 0,
+            "VEHICLELOCKSTATE_LOCKED": 1,
+            "VEHICLELOCKSTATE_INTERNAL_LOCKED": 2,
+            "VEHICLELOCKSTATE_SELECTIVE_UNLOCKED": 3
+          }
+        },
+        "ClosureStatuses": {
+          "fields": {
+            "frontDriverDoor": {
+              "type": "ClosureState_E",
+              "id": 1
+            },
+            "frontPassengerDoor": {
+              "type": "ClosureState_E",
+              "id": 2
+            },
+            "rearDriverDoor": {
+              "type": "ClosureState_E",
+              "id": 3
+            },
+            "rearPassengerDoor": {
+              "type": "ClosureState_E",
+              "id": 4
+            },
+            "rearTrunk": {
+              "type": "ClosureState_E",
+              "id": 5
+            },
+            "frontTrunk": {
+              "type": "ClosureState_E",
+              "id": 6
+            },
+            "chargePort": {
+              "type": "ClosureState_E",
+              "id": 7
+            },
+            "tonneau": {
+              "type": "ClosureState_E",
+              "id": 8
+            }
+          }
+        },
+        "VehicleSleepStatus_E": {
+          "values": {
+            "VEHICLE_SLEEP_STATUS_UNKNOWN": 0,
+            "VEHICLE_SLEEP_STATUS_AWAKE": 1,
+            "VEHICLE_SLEEP_STATUS_ASLEEP": 2
+          }
+        },
+        "DetailedClosureStatus": {
+          "fields": {
+            "tonneauPercentOpen": {
+              "type": "uint32",
+              "id": 1
+            }
+          }
+        },
+        "UserPresence_E": {
+          "values": {
+            "VEHICLE_USER_PRESENCE_UNKNOWN": 0,
+            "VEHICLE_USER_PRESENCE_NOT_PRESENT": 1,
+            "VEHICLE_USER_PRESENCE_PRESENT": 2
+          }
+        },
+        "VehicleStatus": {
+          "fields": {
+            "closureStatuses": {
+              "type": "ClosureStatuses",
+              "id": 1
+            },
+            "vehicleLockState": {
+              "type": "VehicleLockState_E",
+              "id": 2
+            },
+            "vehicleSleepStatus": {
+              "type": "VehicleSleepStatus_E",
+              "id": 3
+            },
+            "userPresence": {
+              "type": "UserPresence_E",
+              "id": 4
+            },
+            "detailedClosureStatus": {
+              "type": "DetailedClosureStatus",
+              "id": 5
+            }
+          }
+        },
+        "FromVCSECMessage": {
+          "oneofs": {
+            "subMessage": {
+              "oneof": [
+                "vehicleStatus",
+                "commandStatus",
+                "whitelistInfo",
+                "whitelistEntryInfo",
+                "nominalError"
+              ]
+            }
+          },
+          "fields": {
+            "vehicleStatus": {
+              "type": "VehicleStatus",
+              "id": 1
+            },
+            "commandStatus": {
+              "type": "CommandStatus",
+              "id": 4
+            },
+            "whitelistInfo": {
+              "type": "WhitelistInfo",
+              "id": 16
+            },
+            "whitelistEntryInfo": {
+              "type": "WhitelistEntryInfo",
+              "id": 17
+            },
+            "nominalError": {
+              "type": "Errors.NominalError",
+              "id": 46
+            }
+          },
+          "reserved": [
+            [
+              6,
+              10
+            ]
+          ]
+        }
+      }
+    },
+    "Keys": {
+      "options": {
+        "java_package": "com.tesla.generated.keys",
+        "go_package": "github.com/teslamotors/vehicle-command/pkg/protocol/protobuf/keys"
+      },
+      "nested": {
+        "Role": {
+          "values": {
+            "ROLE_NONE": 0,
+            "ROLE_SERVICE": 1,
+            "ROLE_OWNER": 2,
+            "ROLE_DRIVER": 3,
+            "ROLE_FM": 4,
+            "ROLE_VEHICLE_MONITOR": 5,
+            "ROLE_CHARGING_MANAGER": 6,
+            "ROLE_GUEST": 8
+          }
+        }
+      }
+    },
+    "Errors": {
+      "options": {
+        "go_package": "github.com/teslamotors/vehicle-command/pkg/protocol/protobuf/errors",
+        "java_package": "com.tesla.generated.errors"
+      },
+      "nested": {
+        "GenericError_E": {
+          "values": {
+            "GENERICERROR_NONE": 0,
+            "GENERICERROR_UNKNOWN": 1,
+            "GENERICERROR_CLOSURES_OPEN": 2,
+            "GENERICERROR_ALREADY_ON": 3,
+            "GENERICERROR_DISABLED_FOR_USER_COMMAND": 4,
+            "GENERICERROR_VEHICLE_NOT_IN_PARK": 5,
+            "GENERICERROR_UNAUTHORIZED": 6,
+            "GENERICERROR_NOT_ALLOWED_OVER_TRANSPORT": 7
+          }
+        },
+        "NominalError": {
+          "fields": {
+            "genericError": {
+              "type": "GenericError_E",
+              "id": 1
+            }
+          }
+        }
+      }
+    },
+    "ManagedCharging": {
+      "options": {
+        "go_package": "github.com/teslamotors/vehicle-command/pkg/protocol/protobuf/managedcharging"
+      },
+      "nested": {
+        "ChargeOnSolarNoChargeReason": {
+          "values": {
+            "CHARGE_ON_SOLAR_NO_CHARGE_REASON_INVALID": 0,
+            "CHARGE_ON_SOLAR_NO_CHARGE_REASON_POWERWALL_CHARGE_PRIORITY": 1,
+            "CHARGE_ON_SOLAR_NO_CHARGE_REASON_INSUFFICIENT_SOLAR": 2,
+            "CHARGE_ON_SOLAR_NO_CHARGE_REASON_GRID_EXPORT_PRIORITY": 3,
+            "CHARGE_ON_SOLAR_NO_CHARGE_REASON_ALTERNATE_VEHICLE_CHARGE_PRIORITY": 4
+          }
+        }
+      }
+    }
+  }
+}
