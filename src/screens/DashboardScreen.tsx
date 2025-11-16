@@ -338,6 +338,8 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   speed: {
+    fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
+    fontVariant: ['tabular-nums'],
     fontWeight: '200',
     letterSpacing: -6,
     textAlign: 'right',
