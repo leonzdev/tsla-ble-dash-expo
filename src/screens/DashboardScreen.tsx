@@ -293,14 +293,15 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   readoutRow: {
-    flexDirection: 'row',
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
+    position: 'relative',
   },
   readoutRowLandscape: {
     minHeight: 140,
+    paddingRight: 160,
   },
   speedWrapper: {
     alignItems: 'center',
@@ -314,10 +315,14 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   metaColumnLandscape: {
-    marginLeft: 16,
+    position: 'absolute',
+    right: 24,
+    top: 0,
+    bottom: 0,
     alignItems: 'flex-start',
     justifyContent: 'center',
     gap: 16,
+    paddingLeft: 16,
   },
   metaRowPortrait: {
     width: '100%',
