@@ -190,7 +190,7 @@ export class TeslaBleTransport {
   }
 
   private async requestDevice(): Promise<Device> {
-    const filters: string[] | null = null;
+    const filters = [TESLA_PAIRING_SERVICE_UUID, TESLA_SERVICE_UUID].map((uuid) => normalizeUuid(uuid));
     const expectedPrefix = this.options.vin ? await vinToLocalName(this.options.vin) : null;
     const mode = this.options.deviceDiscoveryMode ?? DeviceDiscoveryMode.VinPrefixValidation;
     const scanTimeout = this.options.scanTimeoutMs ?? 20000;
@@ -219,10 +219,7 @@ export class TeslaBleTransport {
         resolve(device);
       };
 
-      this.ble.startDeviceScan(filters, { 
-        allowDuplicates: true,
-        scanMode: Platform.OS === 'android' ? 2 : undefined,
-      }, (error, device) => {
+      this.ble.startDeviceScan(filters, { allowDuplicates: false }, (error, device) => {
         if (error) {
           clearTimeout(timer);
           stopScan();
