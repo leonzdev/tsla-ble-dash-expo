@@ -433,7 +433,7 @@ export function DebugScreen() {
       await session.sendAddKeyRequest(
         publicKeyRaw,
         KeyRole.ROLE_VEHICLE_MONITOR,
-        KeyFormFactor.KEY_FORM_FACTOR_ANDROID_DEVICE,
+        KeyFormFactor.KEY_FORM_FACTOR_CLOUD_KEY,
       );
       appendLog('Request sent. Complete the approval on the vehicle UI.');
     } catch (error) {

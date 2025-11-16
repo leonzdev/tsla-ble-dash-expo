@@ -106,8 +106,10 @@ export async function deriveSessionKeys(opts: {
   privateKey: TeslaPrivateKey;
   peerPublicKey: Uint8Array;
 }): Promise<TeslaSessionKeys> {
-  const sharedPoint = p256.getSharedSecret(opts.privateKey.d, opts.peerPublicKey, false);
-  const sharedSecret = sharedPoint.slice(1); // strip format byte
+  // getSharedSecret returns an EC point encoded with a leading format byte.
+  // We only want the X coordinate (32 bytes), which matches WebCrypto's ECDH output.
+  const sharedPoint = p256.getSharedSecret(opts.privateKey.d, opts.peerPublicKey, true);
+  const sharedSecret = sharedPoint.slice(1); // drop format byte, keep 32-byte X coordinate
   const sha1Digest = sha1(sharedSecret);
   const aesKeyBytes = sha1Digest.slice(0, 16);
   const sessionInfoKey = await hmacSha256(aesKeyBytes, utf8ToBytes('session info'));
