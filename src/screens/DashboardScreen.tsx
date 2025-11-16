@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ComponentProps } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from 'react-native';
 import type { AccessibilityState } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -9,6 +17,9 @@ import { useVehicleStore } from '@state/vehicleStore';
 export function DashboardScreen() {
   const [isLandscape, setIsLandscape] = useState(false);
   const orientationSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
+  const theme = useMemo(() => (isDarkMode ? DARK_THEME : LIGHT_THEME), [isDarkMode]);
   const { width, height } = useWindowDimensions();
   const driveState = useVehicleStore((state) => state.driveState);
   const keyLoaded = useVehicleStore((state) => state.keyLoaded);
@@ -25,6 +36,8 @@ export function DashboardScreen() {
   const latencyColor = useMemo(() => latencyColorForValue(latencyMs), [latencyMs]);
   const speedText = formatSpeedDisplay(speed);
   const speedFontSize = shortestSide * 0.9;
+  const orientationIconColor = isLandscape ? theme.orientationIconActive : theme.orientationIcon;
+  const orientationOutlineColor = isLandscape ? theme.orientationIconActive : undefined;
 
   useEffect(() => {
     if (!orientationSupported) {
@@ -67,14 +80,53 @@ export function DashboardScreen() {
     }
   }, [isLandscape, orientationSupported]);
 
+  const IconButton = ({
+    icon,
+    color,
+    onPress,
+    accessibilityLabel,
+    accessibilityState,
+    outlineColor,
+    backgroundColor,
+    pressedBackgroundColor,
+  }: IconButtonProps) => (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={accessibilityState}
+      hitSlop={12}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.iconButton,
+        {
+          borderColor: outlineColor ?? theme.iconBorder,
+          backgroundColor: pressed
+            ? pressedBackgroundColor ?? theme.iconBackgroundPressed
+            : backgroundColor ?? theme.iconBackground,
+        },
+      ]}
+    >
+      <MaterialIcons name={icon} size={28} color={color} />
+    </Pressable>
+  );
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.screen}>
-        <View style={styles.frame}>
+        <View
+          style={[
+            styles.frame,
+            {
+              backgroundColor: theme.surface,
+              borderColor: theme.frameBorder,
+              borderWidth: theme.frameBorder ? StyleSheet.hairlineWidth : 0,
+            },
+          ]}
+        >
           <View style={[styles.readoutRow, isLandscape && styles.readoutRowLandscape]}>
             <View style={styles.speedWrapper}>
               <Text
-                style={[styles.speed, { fontSize: speedFontSize }]}
+                style={[styles.speed, { fontSize: speedFontSize, color: theme.speedText }]}
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 minimumFontScale={0.2}
@@ -85,7 +137,7 @@ export function DashboardScreen() {
 
             {isLandscape && (
               <View style={styles.metaColumnLandscape}>
-                <Text style={styles.gear}>{gear}</Text>
+                <Text style={[styles.gear, { color: theme.primaryText }]}>{gear}</Text>
                 <View style={styles.controlsStack}>
                   <IconButton
                     icon={autoRefreshActive ? 'stop' : 'play-arrow'}
@@ -97,8 +149,8 @@ export function DashboardScreen() {
                   />
                   <IconButton
                     icon={isLandscape ? 'stay-primary-portrait' : 'stay-primary-landscape'}
-                    color={isLandscape ? '#0ea5e9' : '#0f172a'}
-                    outlineColor={isLandscape ? '#0ea5e9' : undefined}
+                    color={orientationIconColor}
+                    outlineColor={orientationOutlineColor}
                     onPress={handleOrientationToggle}
                     accessibilityLabel={isLandscape ? 'Switch to portrait layout' : 'Switch to landscape layout'}
                     accessibilityState={{ checked: isLandscape }}
@@ -111,7 +163,7 @@ export function DashboardScreen() {
           {!isLandscape && (
             <View style={styles.metaRowPortrait}>
               <View style={styles.gearBlock}>
-                <Text style={[styles.gear, styles.gearPortrait]}>{gear}</Text>
+                <Text style={[styles.gear, styles.gearPortrait, { color: theme.primaryText }]}>{gear}</Text>
               </View>
               <View style={styles.controlsStack}>
                 <IconButton
@@ -124,8 +176,8 @@ export function DashboardScreen() {
                 />
                 <IconButton
                   icon={isLandscape ? 'stay-primary-portrait' : 'stay-primary-landscape'}
-                  color={isLandscape ? '#0ea5e9' : '#0f172a'}
-                  outlineColor={isLandscape ? '#0ea5e9' : undefined}
+                  color={orientationIconColor}
+                  outlineColor={orientationOutlineColor}
                   onPress={handleOrientationToggle}
                   accessibilityLabel={isLandscape ? 'Switch to portrait layout' : 'Switch to landscape layout'}
                   accessibilityState={{ checked: isLandscape }}
@@ -135,7 +187,11 @@ export function DashboardScreen() {
           )}
 
           <View style={[styles.latencyContainer, isLandscape && styles.latencyContainerLandscape]}>
-            <Text style={[styles.latency, { color: latencyColor }]}>{latencyText}</Text>
+            <Text
+              style={[styles.latency, { color: latencyColor, textShadowColor: theme.latencyShadow }]}
+            >
+              {latencyText}
+            </Text>
           </View>
 
           {!keyLoaded && <Text style={styles.keyStatus}>Key not loaded</Text>}
@@ -154,34 +210,8 @@ interface IconButtonProps {
   accessibilityLabel: string;
   accessibilityState?: AccessibilityState;
   outlineColor?: string;
-}
-
-function IconButton({
-  icon,
-  color,
-  onPress,
-  accessibilityLabel,
-  accessibilityState,
-  outlineColor,
-}: IconButtonProps) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      accessibilityState={accessibilityState}
-      hitSlop={12}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.iconButton,
-        {
-          borderColor: outlineColor ?? '#e4e4e7',
-          backgroundColor: pressed ? '#f4f4f5' : '#ffffff',
-        },
-      ]}
-    >
-      <MaterialIcons name={icon} size={28} color={color} />
-    </Pressable>
-  );
+  backgroundColor?: string;
+  pressedBackgroundColor?: string;
 }
 
 function parseVehicleSpeed(driveState: any): number | null {
@@ -276,7 +306,6 @@ function latencyColorForValue(latency: number | null): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
   },
   screen: {
     flex: 1,
@@ -310,7 +339,6 @@ const styles = StyleSheet.create({
   },
   speed: {
     fontWeight: '200',
-    color: '#111827',
     letterSpacing: -6,
     textAlign: 'right',
   },
@@ -340,7 +368,6 @@ const styles = StyleSheet.create({
   gear: {
     fontSize: 70,
     fontWeight: '700',
-    color: '#111827',
     textAlign: 'center',
   },
   gearPortrait: {
@@ -357,7 +384,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1.25,
     textTransform: 'uppercase',
-    textShadowColor: 'rgba(0,0,0,0.08)',
     textShadowRadius: 2,
     textShadowOffset: { width: 0, height: 1 },
   },
@@ -390,3 +416,45 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
 });
+
+type DashboardTheme = {
+  background: string;
+  surface: string;
+  speedText: string;
+  primaryText: string;
+  iconBorder: string;
+  iconBackground: string;
+  iconBackgroundPressed: string;
+  orientationIcon: string;
+  orientationIconActive: string;
+  frameBorder?: string;
+  latencyShadow: string;
+};
+
+const LIGHT_THEME: DashboardTheme = {
+  background: '#ffffff',
+  surface: '#ffffff',
+  speedText: '#111827',
+  primaryText: '#111827',
+  iconBorder: '#e4e4e7',
+  iconBackground: '#ffffff',
+  iconBackgroundPressed: '#f4f4f5',
+  orientationIcon: '#0f172a',
+  orientationIconActive: '#0ea5e9',
+  frameBorder: '#e4e4e7',
+  latencyShadow: 'rgba(0,0,0,0.08)',
+};
+
+const DARK_THEME: DashboardTheme = {
+  background: '#030712',
+  surface: '#050b1f',
+  speedText: '#f8fafc',
+  primaryText: '#f8fafc',
+  iconBorder: '#1f2937',
+  iconBackground: '#0f172a',
+  iconBackgroundPressed: '#1f2937',
+  orientationIcon: '#e2e8f0',
+  orientationIconActive: '#38bdf8',
+  frameBorder: '#1f2937',
+  latencyShadow: 'rgba(0,0,0,0.4)',
+};

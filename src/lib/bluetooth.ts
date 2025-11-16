@@ -53,7 +53,17 @@ class SimpleEventEmitter {
   }
 
   emit<T>(event: string, payload: T): void {
-    this.listeners.get(event)?.forEach((listener) => listener(payload));
+    const listeners = this.listeners.get(event);
+    if (!listeners) {
+      return;
+    }
+    for (const listener of listeners) {
+      try {
+        listener(payload);
+      } catch (error) {
+        console.error(`[BLE] Listener for "${event}" failed`, error);
+      }
+    }
   }
 }
 
@@ -257,8 +267,12 @@ export class TeslaBleTransport {
       if (!value) {
         return;
       }
-      const chunk = toByteArray(value);
-      this.handleNotification(chunk);
+      try {
+        const chunk = toByteArray(value);
+        this.handleNotification(chunk);
+      } catch (err) {
+        console.error('Failed to process BLE notification', err);
+      }
     });
   }
 

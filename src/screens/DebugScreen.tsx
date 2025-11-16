@@ -387,26 +387,26 @@ export function DebugScreen() {
     let cancelled = false;
     appendLog('Auto refresh enabled.');
 
-    const run = async () => {
-      if (cancelled) {
-        return;
-      }
-      try {
-        await performVehicleStateFetch('auto');
-      } catch (error) {
-        const detail = error instanceof Error ? error.message : String(error);
-        appendLog(`Auto refresh failed: ${detail}`);
-        console.error('Auto refresh error', error);
-        setStoreAutoRefreshActive(false);
-        appendLog('Auto refresh stopped due to error.');
-        return;
-      }
+    function scheduleNext() {
       if (cancelled || !autoRefreshActive) {
         return;
       }
       const delay = getCurrentRefreshInterval(String(refreshInterval));
       autoRefreshTimer.current = setTimeout(run, delay);
-    };
+    }
+
+    async function run() {
+      if (cancelled || !autoRefreshActive) {
+        return;
+      }
+      try {
+        await performVehicleStateFetch('auto');
+      } catch (error) {
+        reportError('Auto refresh failed', error);
+      } finally {
+        scheduleNext();
+      }
+    }
 
     run();
 
@@ -417,7 +417,7 @@ export function DebugScreen() {
         autoRefreshTimer.current = null;
       }
     };
-  }, [appendLog, autoRefreshActive, performVehicleStateFetch, refreshInterval, setStoreAutoRefreshActive]);
+  }, [appendLog, autoRefreshActive, performVehicleStateFetch, refreshInterval, reportError]);
 
   const handleManualFetch = useCallback(async () => {
     try {
