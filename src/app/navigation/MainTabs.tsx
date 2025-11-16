@@ -1,6 +1,8 @@
-import { ReactNode, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import { useVehicleStore } from '@state/vehicleStore';
 import { DashboardScreen } from '@screens/DashboardScreen';
 import { DebugScreen } from '@screens/DebugScreen';
 
@@ -23,6 +25,21 @@ export function MainTabs() {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
   const hideNav = useMemo(() => activeTab === 'dashboard' && isLandscape, [activeTab, isLandscape]);
+  const autoRefreshActive = useVehicleStore((state) => state.autoRefreshActive);
+
+  useEffect(() => {
+    const tag = 'auto-refresh';
+    if (autoRefreshActive) {
+      activateKeepAwakeAsync(tag).catch((error) => {
+        console.warn('Failed to enable keep-awake', error);
+      });
+    } else {
+      deactivateKeepAwake(tag);
+    }
+    return () => {
+      deactivateKeepAwake(tag);
+    };
+  }, [autoRefreshActive]);
 
   return (
     <View style={styles.container}>
