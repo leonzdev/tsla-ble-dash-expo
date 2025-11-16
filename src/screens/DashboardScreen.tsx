@@ -85,7 +85,7 @@ export function DashboardScreen() {
 
             <View style={styles.metaColumn}>
               <Text style={styles.gear}>{gear}</Text>
-              <View style={[styles.controls, isLandscape && styles.controlsLandscape]}>
+              <View style={styles.controls}>
                 <IconButton
                   icon={autoRefreshActive ? 'stop' : 'play-arrow'}
                   color={autoRefreshActive ? '#dc2626' : '#16a34a'}
@@ -263,13 +263,14 @@ const styles = StyleSheet.create({
   },
   readoutRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
   },
   speedWrapper: {
-    flex: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 0,
   },
   speed: {
     fontWeight: '200',
@@ -290,13 +291,10 @@ const styles = StyleSheet.create({
     letterSpacing: 6,
   },
   controls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  controlsLandscape: {
     flexDirection: 'column',
-    alignItems: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
   },
   latency: {
     fontSize: 16,

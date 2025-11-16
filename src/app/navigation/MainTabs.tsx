@@ -1,5 +1,5 @@
-import { ReactNode, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ReactNode, useMemo, useState } from 'react';
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DashboardScreen } from '@screens/DashboardScreen';
 import { DebugScreen } from '@screens/DebugScreen';
@@ -20,6 +20,9 @@ const TAB_CONFIG: TabConfig[] = [
 export function MainTabs() {
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
   const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
+  const hideNav = useMemo(() => activeTab === 'dashboard' && isLandscape, [activeTab, isLandscape]);
 
   return (
     <View style={styles.container}>
@@ -37,22 +40,24 @@ export function MainTabs() {
           );
         })}
       </View>
-      <View style={[styles.nav, { paddingBottom: Math.max(insets.bottom, 8) }]}>
-        {TAB_CONFIG.map((tab) => {
-          const isActive = tab.key === activeTab;
-          return (
-            <Pressable
-              key={tab.key}
-              accessibilityRole="button"
-              accessibilityState={{ selected: isActive }}
-              onPress={() => setActiveTab(tab.key)}
-              style={[styles.navButton, isActive && styles.navButtonActive]}
-            >
-              <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>{tab.label}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      {!hideNav && (
+        <View style={[styles.nav, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+          {TAB_CONFIG.map((tab) => {
+            const isActive = tab.key === activeTab;
+            return (
+              <Pressable
+                key={tab.key}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isActive }}
+                onPress={() => setActiveTab(tab.key)}
+                style={[styles.navButton, isActive && styles.navButtonActive]}
+              >
+                <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>{tab.label}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
     </View>
   );
 }
