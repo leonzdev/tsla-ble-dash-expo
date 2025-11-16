@@ -497,16 +497,10 @@ export function DebugScreen() {
         <Text style={styles.deviceInfo}>{deviceInfoText}</Text>
         <View style={styles.row}>
           <AppButton
-            label="Select Vehicle"
+            label="Verify VIN"
             onPress={handleSelectVehicle}
             variant="primary"
             disabled={isBusy('select-vehicle')}
-            fullWidth
-          />
-          <AppButton
-            label="Connect"
-            onPress={handleEnsureSession}
-            disabled={isBusy('connect-session')}
             fullWidth
           />
         </View>
@@ -581,9 +575,9 @@ export function DebugScreen() {
             fullWidth
           />
           <AppButton
-            label={autoRefreshActive ? 'Stop Auto Refresh' : 'Start Auto Refresh'}
-            onPress={() => setStoreAutoRefreshActive(!autoRefreshActive)}
-            variant="primary"
+            label="Connect"
+            onPress={handleEnsureSession}
+            disabled={isBusy('connect-session')}
             fullWidth
           />
         </View>

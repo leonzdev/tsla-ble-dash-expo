@@ -6,7 +6,7 @@ import { useVehicleStore } from '@state/vehicleStore';
 import { DashboardScreen } from '@screens/DashboardScreen';
 import { DebugScreen } from '@screens/DebugScreen';
 
-type TabKey = 'dashboard' | 'debug';
+type TabKey = 'dashboard' | 'settings';
 
 interface TabConfig {
   key: TabKey;
@@ -16,7 +16,7 @@ interface TabConfig {
 
 const TAB_CONFIG: TabConfig[] = [
   { key: 'dashboard', label: 'Dashboard', render: () => <DashboardScreen /> },
-  { key: 'debug', label: 'Debug', render: () => <DebugScreen /> },
+  { key: 'settings', label: 'Settings', render: () => <DebugScreen /> },
 ];
 
 export function MainTabs() {
