@@ -106,7 +106,9 @@ export function DashboardScreen() {
             </View>
           </View>
 
-          <Text style={[styles.latency, { color: latencyColor }]}>{latencyText}</Text>
+          <View style={[styles.latencyContainer, isLandscape && styles.latencyContainerLandscape]}>
+            <Text style={[styles.latency, { color: latencyColor }]}>{latencyText}</Text>
+          </View>
 
           {!keyLoaded && <Text style={styles.keyStatus}>Key not loaded</Text>}
         </View>
@@ -260,6 +262,7 @@ const styles = StyleSheet.create({
     maxWidth: 760,
     alignItems: 'center',
     gap: 32,
+    position: 'relative',
   },
   readoutRow: {
     flexDirection: 'row',
@@ -298,8 +301,22 @@ const styles = StyleSheet.create({
   },
   latency: {
     fontSize: 16,
+    fontWeight: '700',
     letterSpacing: 1.25,
     textTransform: 'uppercase',
+    textShadowColor: 'rgba(0,0,0,0.08)',
+    textShadowRadius: 2,
+    textShadowOffset: { width: 0, height: 1 },
+  },
+  latencyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  latencyContainerLandscape: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    alignItems: 'flex-end',
   },
   keyStatus: {
     fontSize: 15,
