@@ -71,7 +71,7 @@ export function DashboardScreen() {
     <View style={styles.container}>
       <View style={styles.screen}>
         <View style={styles.frame}>
-          <View style={styles.readoutRow}>
+          <View style={[styles.readoutRow, isLandscape && styles.readoutRowLandscape]}>
             <View style={styles.speedWrapper}>
               <Text
                 style={[styles.speed, { fontSize: speedFontSize }]}
@@ -83,9 +83,37 @@ export function DashboardScreen() {
               </Text>
             </View>
 
-            <View style={styles.metaColumn}>
-              <Text style={styles.gear}>{gear}</Text>
-              <View style={styles.controls}>
+            {isLandscape && (
+              <View style={styles.metaColumnLandscape}>
+                <Text style={styles.gear}>{gear}</Text>
+                <View style={styles.controlsStack}>
+                  <IconButton
+                    icon={autoRefreshActive ? 'stop' : 'play-arrow'}
+                    color={autoRefreshActive ? '#dc2626' : '#16a34a'}
+                    outlineColor={autoRefreshActive ? '#dc2626' : '#16a34a'}
+                    onPress={toggleAutoRefresh}
+                    accessibilityLabel={autoRefreshActive ? 'Stop auto refresh' : 'Start auto refresh'}
+                    accessibilityState={{ checked: autoRefreshActive }}
+                  />
+                  <IconButton
+                    icon={isLandscape ? 'stay-primary-portrait' : 'stay-primary-landscape'}
+                    color={isLandscape ? '#0ea5e9' : '#0f172a'}
+                    outlineColor={isLandscape ? '#0ea5e9' : undefined}
+                    onPress={handleOrientationToggle}
+                    accessibilityLabel={isLandscape ? 'Switch to portrait layout' : 'Switch to landscape layout'}
+                    accessibilityState={{ checked: isLandscape }}
+                  />
+                </View>
+              </View>
+            )}
+          </View>
+
+          {!isLandscape && (
+            <View style={styles.metaRowPortrait}>
+              <View style={styles.gearBlock}>
+                <Text style={[styles.gear, styles.gearPortrait]}>{gear}</Text>
+              </View>
+              <View style={styles.controlsStack}>
                 <IconButton
                   icon={autoRefreshActive ? 'stop' : 'play-arrow'}
                   color={autoRefreshActive ? '#dc2626' : '#16a34a'}
@@ -104,7 +132,7 @@ export function DashboardScreen() {
                 />
               </View>
             </View>
-          </View>
+          )}
 
           <View style={[styles.latencyContainer, isLandscape && styles.latencyContainerLandscape]}>
             <Text style={[styles.latency, { color: latencyColor }]}>{latencyText}</Text>
@@ -185,7 +213,7 @@ function parseVehicleSpeed(driveState: any): number | null {
 
 function formatSpeedDisplay(value: number | null): string {
   if (value === null || Number.isNaN(value)) {
-    return '--';
+    return 'N/A';
   }
   const rounded = Math.max(0, Math.round(value));
   return String(rounded).padStart(2, '0');
@@ -193,12 +221,12 @@ function formatSpeedDisplay(value: number | null): string {
 
 function formatShiftState(raw: any): string {
   if (!raw) {
-    return '—';
+    return 'X';
   }
   if (typeof raw === 'string') {
     const trimmed = raw.trim();
     if (!trimmed) {
-      return '—';
+      return 'X';
     }
     if (trimmed.length === 1) {
       return trimmed.toUpperCase();
@@ -216,13 +244,13 @@ function formatShiftState(raw: any): string {
       }
     }
     if (raw.Invalid != null || raw.invalid != null) {
-      return '—';
+      return 'X';
     }
     if (typeof raw.type === 'string') {
       return formatShiftState(raw.type);
     }
   }
-  return '—';
+  return 'X';
 }
 
 function formatLatencyDisplay(latency: number | null): string {
@@ -266,9 +294,13 @@ const styles = StyleSheet.create({
   },
   readoutRow: {
     flexDirection: 'row',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
+    paddingVertical: 12,
+  },
+  readoutRowLandscape: {
+    minHeight: 140,
   },
   speedWrapper: {
     alignItems: 'center',
@@ -281,19 +313,37 @@ const styles = StyleSheet.create({
     letterSpacing: -6,
     textAlign: 'right',
   },
-  metaColumn: {
+  metaColumnLandscape: {
     marginLeft: 16,
     alignItems: 'flex-start',
     justifyContent: 'center',
     gap: 16,
+  },
+  metaRowPortrait: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 32,
+  },
+  gearBlock: {
+    height: 216,
+    minWidth: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   gear: {
     fontSize: 40,
     fontWeight: '700',
     color: '#111827',
     letterSpacing: 6,
+    textAlign: 'center',
   },
-  controls: {
+  gearPortrait: {
+    fontSize: 80,
+    letterSpacing: 8,
+  },
+  controlsStack: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
