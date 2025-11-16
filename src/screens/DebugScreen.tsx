@@ -38,6 +38,7 @@ const REFRESH_INTERVAL_STORAGE_KEY = 'tsla.stateRefreshIntervalMs';
 const DEFAULT_REFRESH_INTERVAL_MS = 1000;
 const MIN_REFRESH_INTERVAL_MS = 0;
 const MAX_REFRESH_INTERVAL_MS = 60_000;
+const DEFAULT_DISCOVERY_MODE = DeviceDiscoveryMode.VinPrefixPromptFilter;
 
 interface StoredProfile {
   id: string;
@@ -53,6 +54,7 @@ export function DebugScreen() {
   const [profileName, setProfileName] = useState('');
   const [profiles, setProfiles] = useState<StoredProfile[]>([]);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [hasAppliedInitialProfile, setHasAppliedInitialProfile] = useState(false);
   const [privateKeyPem, setPrivateKeyPem] = useState('');
   const [publicKeyPem, setPublicKeyPem] = useState('');
   const [privateKey, setPrivateKey] = useState<TeslaPrivateKey | null>(null);
@@ -60,13 +62,12 @@ export function DebugScreen() {
   const [stateOutput, setStateOutput] = useState('Vehicle state output will appear here.');
   const [stateCategory, setStateCategory] = useState<StateCategory>(StateCategory.Drive);
   const [refreshInterval, setRefreshInterval] = useState(DEFAULT_REFRESH_INTERVAL_MS);
-  const [discoveryMode, setDiscoveryMode] = useState<DeviceDiscoveryMode>(DeviceDiscoveryMode.Unfiltered);
   const [deviceInfo, setDeviceInfo] = useState<SelectedDeviceInfo | null>(null);
   const [busyAction, setBusyAction] = useState<string | null>(null);
 
   const autoRefreshTimer = useRef<NodeJS.Timeout | null>(null);
   const sessionRef = useRef<TeslaBleSession | null>(null);
-  const sessionConfigRef = useRef<{ vin: string; discoveryMode: DeviceDiscoveryMode } | null>(null);
+  const sessionConfigRef = useRef<{ vin: string } | null>(null);
   const stateCategoryOptions = useMemo(() => Object.values(StateCategory) as StateCategory[], []);
 
   const setStoreVin = useVehicleStore((state) => state.setVin);
@@ -136,16 +137,16 @@ export function DebugScreen() {
       throw new Error('VIN is required');
     }
     const current = sessionConfigRef.current;
-    if (!sessionRef.current || !current || current.vin !== normalizedVin || current.discoveryMode !== discoveryMode) {
+    if (!sessionRef.current || !current || current.vin !== normalizedVin) {
       sessionRef.current?.disconnect().catch(() => {});
       sessionRef.current = new TeslaBleSession({
         vin: normalizedVin,
-        deviceDiscoveryMode: discoveryMode,
+        deviceDiscoveryMode: DEFAULT_DISCOVERY_MODE,
       });
-      sessionConfigRef.current = { vin: normalizedVin, discoveryMode };
+      sessionConfigRef.current = { vin: normalizedVin };
     }
     return sessionRef.current;
-  }, [vin, discoveryMode]);
+  }, [vin]);
 
   const ensurePrivateKeyValue = useCallback(async (): Promise<TeslaPrivateKey> => {
     if (privateKey) {
@@ -219,6 +220,19 @@ export function DebugScreen() {
     },
     [appendLog, reportError, profiles],
   );
+
+  useEffect(() => {
+    if (!profiles.length) {
+      if (hasAppliedInitialProfile) {
+        setHasAppliedInitialProfile(false);
+      }
+      return;
+    }
+    if (!hasAppliedInitialProfile && !selectedProfileId) {
+      setHasAppliedInitialProfile(true);
+      void handleProfileChange(profiles[0].id);
+    }
+  }, [handleProfileChange, hasAppliedInitialProfile, profiles, selectedProfileId]);
 
   const handleSaveProfile = useCallback(async () => {
     try {
@@ -476,18 +490,6 @@ export function DebugScreen() {
             style={styles.input}
             autoCapitalize="characters"
           />
-        </Field>
-        <Field label="Device Discovery Mode">
-          <Picker
-            selectedValue={discoveryMode}
-            onValueChange={(value) => setDiscoveryMode(value as DeviceDiscoveryMode)}
-            dropdownIconColor="#94a3b8"
-            style={styles.picker}
-          >
-            <Picker.Item label="VIN prefix filter in prompt" value={DeviceDiscoveryMode.VinPrefixPromptFilter} />
-            <Picker.Item label="VIN prefix validation" value={DeviceDiscoveryMode.VinPrefixValidation} />
-            <Picker.Item label="No VIN prefix checks" value={DeviceDiscoveryMode.Unfiltered} />
-          </Picker>
         </Field>
         <Text style={styles.deviceInfoLabel}>Connected Device</Text>
         <Text style={styles.deviceInfo}>{deviceInfoText}</Text>
