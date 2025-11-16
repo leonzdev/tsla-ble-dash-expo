@@ -338,15 +338,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   gear: {
-    fontSize: 40,
+    fontSize: 70,
     fontWeight: '700',
     color: '#111827',
-    letterSpacing: 6,
     textAlign: 'center',
   },
   gearPortrait: {
     fontSize: 80,
-    letterSpacing: 8,
   },
   controlsStack: {
     flexDirection: 'column',
