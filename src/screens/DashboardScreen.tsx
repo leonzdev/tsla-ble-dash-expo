@@ -8,11 +8,14 @@ export function DashboardScreen() {
   const keyLoaded = useVehicleStore((state) => state.keyLoaded);
   const autoRefreshActive = useVehicleStore((state) => state.autoRefreshActive);
   const toggleAutoRefresh = useVehicleStore((state) => state.toggleAutoRefresh);
+  const latencyMs = useVehicleStore((state) => state.lastLatencyMs);
 
   const driveData = driveState?.vehicleData?.driveState ?? driveState?.vehicleData?.drive_state ?? null;
 
   const speed = useMemo(() => parseVehicleSpeed(driveData), [driveData]);
   const gear = useMemo(() => formatShiftState(driveData?.shiftState ?? driveData?.shift_state), [driveData]);
+  const latencyText = useMemo(() => formatLatencyDisplay(latencyMs), [latencyMs]);
+  const latencyColor = useMemo(() => latencyColorForValue(latencyMs), [latencyMs]);
 
   return (
     <View style={[styles.container, isLandscape && styles.containerLandscape]}>
@@ -21,6 +24,7 @@ export function DashboardScreen() {
           <Text style={[styles.speed, isLandscape && styles.speedLandscape]}>{formatSpeedDisplay(speed)}</Text>
           <Text style={styles.units}>MPH</Text>
           <Text style={styles.gear}>{gear}</Text>
+          <Text style={[styles.latency, { color: latencyColor }]}>{latencyText}</Text>
         </View>
 
         {!keyLoaded && (
@@ -138,6 +142,26 @@ function formatShiftState(raw: any): string {
   return '—';
 }
 
+function formatLatencyDisplay(latency: number | null): string {
+  if (latency == null || Number.isNaN(latency)) {
+    return 'Latency --';
+  }
+  return `Latency ${Math.round(latency)} ms`;
+}
+
+function latencyColorForValue(latency: number | null): string {
+  if (latency == null || Number.isNaN(latency)) {
+    return '#94a3b8';
+  }
+  if (latency < 300) {
+    return '#22c55e';
+  }
+  if (latency < 800) {
+    return '#facc15';
+  }
+  return '#f87171';
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -191,6 +215,11 @@ const styles = StyleSheet.create({
     color: '#f8fafc',
     fontWeight: '600',
     marginTop: 12,
+  },
+  latency: {
+    fontSize: 12,
+    marginTop: 8,
+    letterSpacing: 0.5,
   },
   statusCard: {
     padding: 16,

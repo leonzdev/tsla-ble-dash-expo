@@ -73,6 +73,7 @@ export function DebugScreen() {
   const setStoreVin = useVehicleStore((state) => state.setVin);
   const setStoreKeyLoaded = useVehicleStore((state) => state.setKeyLoaded);
   const setStoreDriveState = useVehicleStore((state) => state.setDriveState);
+  const setStoreLatency = useVehicleStore((state) => state.setLastLatency);
   const autoRefreshActive = useVehicleStore((state) => state.autoRefreshActive);
   const setStoreAutoRefreshActive = useVehicleStore((state) => state.setAutoRefreshActive);
 
@@ -340,8 +341,9 @@ export function DebugScreen() {
       const timestamp = formatTimestamp(new Date());
       const payload = JSON.stringify(result.vehicleData, null, 2);
       setStateOutput(`Last update (${timestamp}) — Category: ${category} — Latency: ${latencyMs} ms\n${payload}`);
+      setStoreLatency(latencyMs);
     },
-    [setStoreDriveState],
+    [setStoreDriveState, setStoreLatency],
   );
 
   const fetchCategory = useCallback(
