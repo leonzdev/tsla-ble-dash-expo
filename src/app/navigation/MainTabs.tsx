@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DashboardScreen } from '@screens/DashboardScreen';
@@ -19,12 +19,24 @@ const TAB_CONFIG: TabConfig[] = [
 
 export function MainTabs() {
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
-  const CurrentScreen = useMemo(() => TAB_CONFIG.find((tab) => tab.key === activeTab)?.render, [activeTab]);
   const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.container}>
-      <View style={styles.body}>{CurrentScreen ? CurrentScreen() : null}</View>
+      <View style={styles.body}>
+        {TAB_CONFIG.map((tab) => {
+          const isActive = tab.key === activeTab;
+          return (
+            <View
+              key={tab.key}
+              style={[styles.screen, !isActive && styles.screenHidden]}
+              pointerEvents={isActive ? 'auto' : 'none'}
+            >
+              {tab.render()}
+            </View>
+          );
+        })}
+      </View>
       <View style={[styles.nav, { paddingBottom: Math.max(insets.bottom, 8) }]}>
         {TAB_CONFIG.map((tab) => {
           const isActive = tab.key === activeTab;
@@ -52,6 +64,12 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+  },
+  screen: {
+    flex: 1,
+  },
+  screenHidden: {
+    display: 'none',
   },
   nav: {
     flexDirection: 'row',
