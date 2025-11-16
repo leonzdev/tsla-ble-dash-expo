@@ -100,15 +100,16 @@ export class TeslaBleTransport {
     });
 
     const discovered = await connectedDevice.discoverAllServicesAndCharacteristics();
+    let preparedDevice: Device = discovered;
     if (Platform.OS === 'android') {
       try {
-        await discovered.requestMTU(247);
+        preparedDevice = await discovered.requestMTU(247);
       } catch (error) {
         console.warn('Failed to request MTU, continuing with default.', error);
       }
     }
 
-    const services = await discovered.services();
+    const services = await preparedDevice.services();
     const teslaService = services.find((service) => matchesUuid(service.uuid, TESLA_SERVICE_UUID));
     if (!teslaService) {
       throw new Error('Tesla BLE service not available on device');
@@ -123,9 +124,10 @@ export class TeslaBleTransport {
 
     this.txChar = tx;
     this.rxChar = rx;
-    this.device = discovered;
+    this.device = preparedDevice;
     this.writeMode = tx.isWritableWithResponse ? 'with-response' : 'without-response';
-    this.blockLength = determineBlockLength(discovered.mtu ?? 23, this.options.preferredBlockLength);
+    this.blockLength = determineBlockLength(preparedDevice.mtu ?? 23, this.options.preferredBlockLength);
+    console.log('[BLE] MTU resolved to', preparedDevice.mtu ?? 23, '=> block length', this.blockLength);
 
     await this.startNotifications();
   }
@@ -263,6 +265,13 @@ export class TeslaBleTransport {
   private async writePacket(packet: Uint8Array): Promise<void> {
     for (let offset = 0; offset < packet.length; offset += this.blockLength) {
       const block = packet.subarray(offset, Math.min(offset + this.blockLength, packet.length));
+      console.log(
+        '[BLE] Writing chunk',
+        `${block.length} bytes`,
+        `mode=${this.writeMode}`,
+        `mtuBlock=${this.blockLength}`,
+        `remaining=${packet.length - (offset + block.length)}`,
+      );
       await this.writeChunk(block);
     }
   }
@@ -298,14 +307,17 @@ export class TeslaBleTransport {
     }
     if (this.writeMode === 'with-response' && this.txChar?.isWritableWithoutResponse) {
       this.writeMode = 'without-response';
+      console.warn('[BLE] Falling back to writeWithoutResponse');
       return true;
     }
     if (this.writeMode === 'without-response' && this.txChar?.isWritableWithResponse) {
       this.writeMode = 'with-response';
+      console.warn('[BLE] Falling back to writeWithResponse');
       return true;
     }
     if (this.blockLength > MIN_BLOCK_LENGTH) {
       this.blockLength = Math.max(MIN_BLOCK_LENGTH, Math.floor(this.blockLength / 2));
+      console.warn('[BLE] Reducing block size due to repeated errors', this.blockLength);
       return true;
     }
     return false;

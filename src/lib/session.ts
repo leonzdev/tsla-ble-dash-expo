@@ -376,9 +376,16 @@ export class TeslaBleSession {
       return;
     }
     const key = toHex(new Uint8Array(requestUuid));
+    if (__DEV__) {
+      console.debug('[BLE][RX]', {
+        uuid: key,
+        flags: message.flags ?? 0,
+        hasPending: this.pending.has(key),
+      });
+    }
     const pending = this.pending.get(key);
     if (!pending) {
-      console.warn('No pending request for UUID', key);
+      console.warn('No pending request for UUID', key, 'message flags', message.flags ?? 0);
       return;
     }
     this.pending.delete(key);
