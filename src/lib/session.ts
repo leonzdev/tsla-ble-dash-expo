@@ -25,7 +25,7 @@ import {
   BleDevice,
 } from './bluetooth';
 export { DeviceDiscoveryMode } from './bluetooth';
-export { StateCategory } from './protocol';
+export { StateCategory, KeyRole, KeyFormFactor } from './protocol';
 import {
   randomBytes,
   deriveSessionKeys,
@@ -141,14 +141,12 @@ export class TeslaBleSession {
     this.failPending(new Error('Disconnected'));
   }
 
-  async sendAddKeyRequest(params: { publicKeyRaw: Uint8Array; role?: number; formFactor?: number }): Promise<void> {
+  async sendAddKeyRequest(publicKeyRaw: Uint8Array, role: number, formFactor: number): Promise<void> {
     // BLE-only flow; no authenticated session required. The vehicle will prompt for NFC tap.
     if (!this.connected) {
       await this.connect();
     }
-    const role = params.role ?? KeyRole.ROLE_DRIVER;
-    const formFactor = params.formFactor ?? KeyFormFactor.KEY_FORM_FACTOR_IOS_DEVICE;
-    const payload = encodeVcsecAddKeyRequest({ publicKeyRaw: params.publicKeyRaw, role, formFactor });
+    const payload = encodeVcsecAddKeyRequest({ publicKeyRaw, role, formFactor });
     await this.transport.send(payload);
   }
 

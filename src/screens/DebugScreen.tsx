@@ -16,6 +16,8 @@ import {
   DeviceDiscoveryMode,
   VehicleStateResult,
   SelectedDeviceInfo,
+  KeyRole,
+  KeyFormFactor,
 } from '@lib/session';
 import {
   generatePrivateKey,
@@ -428,7 +430,11 @@ export function DebugScreen() {
       await session.connect();
       const publicKeyRaw = await resolvePublicKeyRaw(privateKey, publicKeyPem, ensurePrivateKeyValue);
       appendLog('Sending add-key request over BLE…');
-      await session.sendAddKeyRequest({ publicKeyRaw });
+      await session.sendAddKeyRequest(
+        publicKeyRaw,
+        KeyRole.ROLE_VEHICLE_MONITOR,
+        KeyFormFactor.KEY_FORM_FACTOR_ANDROID_DEVICE,
+      );
       appendLog('Request sent. Complete the approval on the vehicle UI.');
     } catch (error) {
       reportError('Failed to enroll key', error);
