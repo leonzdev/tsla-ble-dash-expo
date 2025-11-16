@@ -1,9 +1,15 @@
-import { useMemo, useState } from 'react';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { ComponentProps } from 'react';
+import { Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import type { AccessibilityState } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import { useVehicleStore } from '@state/vehicleStore';
 
 export function DashboardScreen() {
   const [isLandscape, setIsLandscape] = useState(false);
+  const orientationSupported = Platform.OS === 'ios' || Platform.OS === 'android';
+  const { width, height } = useWindowDimensions();
   const driveState = useVehicleStore((state) => state.driveState);
   const keyLoaded = useVehicleStore((state) => state.keyLoaded);
   const autoRefreshActive = useVehicleStore((state) => state.autoRefreshActive);
@@ -12,63 +18,138 @@ export function DashboardScreen() {
 
   const driveData = driveState?.vehicleData?.driveState ?? driveState?.vehicleData?.drive_state ?? null;
 
+  const shortestSide = Math.min(width, height);
   const speed = useMemo(() => parseVehicleSpeed(driveData), [driveData]);
   const gear = useMemo(() => formatShiftState(driveData?.shiftState ?? driveData?.shift_state), [driveData]);
   const latencyText = useMemo(() => formatLatencyDisplay(latencyMs), [latencyMs]);
   const latencyColor = useMemo(() => latencyColorForValue(latencyMs), [latencyMs]);
+  const speedText = formatSpeedDisplay(speed);
+  const speedFontSize = shortestSide * 0.9;
+
+  useEffect(() => {
+    if (!orientationSupported) {
+      return;
+    }
+    let cancelled = false;
+    const enforcePortrait = async () => {
+      try {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+        if (!cancelled) {
+          setIsLandscape(false);
+        }
+      } catch (error) {
+        console.warn('Failed to enforce portrait orientation', error);
+      }
+    };
+    void enforcePortrait();
+    return () => {
+      cancelled = true;
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP).catch((error) => {
+        console.warn('Failed to reset orientation lock', error);
+      });
+    };
+  }, [orientationSupported]);
+
+  const handleOrientationToggle = useCallback(async () => {
+    const next = !isLandscape;
+    setIsLandscape(next);
+    if (!orientationSupported) {
+      return;
+    }
+    const targetLock = next
+      ? ScreenOrientation.OrientationLock.LANDSCAPE
+      : ScreenOrientation.OrientationLock.PORTRAIT_UP;
+    try {
+      await ScreenOrientation.lockAsync(targetLock);
+    } catch (error) {
+      console.warn('Failed to toggle orientation', error);
+      setIsLandscape(!next);
+    }
+  }, [isLandscape, orientationSupported]);
 
   return (
-    <View style={[styles.container, isLandscape && styles.containerLandscape]}>
-      <View style={styles.stage}>
-        <View style={[styles.display, isLandscape && styles.displayLandscape]}>
-          <Text style={[styles.speed, isLandscape && styles.speedLandscape]}>{formatSpeedDisplay(speed)}</Text>
-          <Text style={styles.units}>MPH</Text>
-          <Text style={styles.gear}>{gear}</Text>
-          <Text style={[styles.latency, { color: latencyColor }]}>{latencyText}</Text>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.screen}>
+        <View style={styles.frame}>
+          <View style={styles.readoutRow}>
+            <View style={styles.speedWrapper}>
+              <Text
+                style={[styles.speed, { fontSize: speedFontSize }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.2}
+              >
+                {speedText}
+              </Text>
+            </View>
 
-        {!keyLoaded && (
-          <View style={styles.statusCard}>
-            <Text style={styles.statusText}>Key: Not loaded</Text>
+            <View style={styles.metaColumn}>
+              <Text style={styles.gear}>{gear}</Text>
+              <View style={[styles.controls, isLandscape && styles.controlsLandscape]}>
+                <IconButton
+                  icon={autoRefreshActive ? 'stop' : 'play-arrow'}
+                  color={autoRefreshActive ? '#dc2626' : '#16a34a'}
+                  outlineColor={autoRefreshActive ? '#dc2626' : '#16a34a'}
+                  onPress={toggleAutoRefresh}
+                  accessibilityLabel={autoRefreshActive ? 'Stop auto refresh' : 'Start auto refresh'}
+                  accessibilityState={{ checked: autoRefreshActive }}
+                />
+                <IconButton
+                  icon={isLandscape ? 'stay-primary-portrait' : 'stay-primary-landscape'}
+                  color={isLandscape ? '#0ea5e9' : '#0f172a'}
+                  outlineColor={isLandscape ? '#0ea5e9' : undefined}
+                  onPress={handleOrientationToggle}
+                  accessibilityLabel={isLandscape ? 'Switch to portrait layout' : 'Switch to landscape layout'}
+                  accessibilityState={{ checked: isLandscape }}
+                />
+              </View>
+            </View>
           </View>
-        )}
 
-        <View style={styles.controls}>
-          <DashboardButton
-            label={isLandscape ? 'Portrait Layout' : 'Landscape Layout'}
-            onPress={() => setIsLandscape((prev) => !prev)}
-          />
-          <DashboardButton
-            label={autoRefreshActive ? 'Stop Auto Refresh' : 'Start Auto Refresh'}
-            onPress={toggleAutoRefresh}
-            primary
-            active={autoRefreshActive}
-          />
+          <Text style={[styles.latency, { color: latencyColor }]}>{latencyText}</Text>
+
+          {!keyLoaded && <Text style={styles.keyStatus}>Key not loaded</Text>}
         </View>
       </View>
     </View>
   );
 }
 
-interface DashboardButtonProps {
-  label: string;
+type MaterialIconName = ComponentProps<typeof MaterialIcons>['name'];
+
+interface IconButtonProps {
+  icon: MaterialIconName;
+  color: string;
   onPress: () => void;
-  primary?: boolean;
-  active?: boolean;
+  accessibilityLabel: string;
+  accessibilityState?: AccessibilityState;
+  outlineColor?: string;
 }
 
-function DashboardButton({ label, onPress, primary, active }: DashboardButtonProps) {
+function IconButton({
+  icon,
+  color,
+  onPress,
+  accessibilityLabel,
+  accessibilityState,
+  outlineColor,
+}: IconButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={accessibilityState}
+      hitSlop={12}
       onPress={onPress}
-      style={[
-        styles.button,
-        primary && styles.buttonPrimary,
-        active && primary && styles.buttonPrimaryActive,
+      style={({ pressed }) => [
+        styles.iconButton,
+        {
+          borderColor: outlineColor ?? '#e4e4e7',
+          backgroundColor: pressed ? '#f4f4f5' : '#ffffff',
+        },
       ]}
     >
-      <Text style={[styles.buttonLabel, primary && styles.buttonLabelPrimary]}>{label}</Text>
+      <MaterialIcons name={icon} size={28} color={color} />
     </Pressable>
   );
 }
@@ -165,100 +246,79 @@ function latencyColorForValue(latency: number | null): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#030712',
-    paddingHorizontal: 16,
-    paddingVertical: 24,
+    backgroundColor: '#ffffff',
   },
-  containerLandscape: {
-    justifyContent: 'center',
-  },
-  stage: {
+  screen: {
     flex: 1,
-    borderRadius: 24,
-    backgroundColor: '#050b1f',
-    padding: 24,
-    gap: 24,
-    borderWidth: 1,
-    borderColor: '#111827',
-  },
-  display: {
+    paddingHorizontal: 24,
+    paddingVertical: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0f172a',
-    borderRadius: 24,
-    paddingVertical: 48,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: '#1f2937',
   },
-  displayLandscape: {
+  frame: {
+    width: '100%',
+    maxWidth: 760,
+    alignItems: 'center',
+    gap: 32,
+  },
+  readoutRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 32,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  speedWrapper: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
   speed: {
-    fontSize: 92,
-    color: '#f8fafc',
     fontWeight: '200',
-    letterSpacing: 4,
+    color: '#111827',
+    letterSpacing: -6,
+    textAlign: 'right',
   },
-  speedLandscape: {
-    fontSize: 108,
-  },
-  units: {
-    color: '#94a3b8',
-    fontSize: 16,
-    marginTop: -8,
+  metaColumn: {
+    marginLeft: 16,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    gap: 16,
   },
   gear: {
-    fontSize: 48,
-    color: '#f8fafc',
-    fontWeight: '600',
-    marginTop: 12,
-  },
-  latency: {
-    fontSize: 12,
-    marginTop: 8,
-    letterSpacing: 0.5,
-  },
-  statusCard: {
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: '#7f1d1d',
-  },
-  statusText: {
-    color: '#fecaca',
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 40,
+    fontWeight: '700',
+    color: '#111827',
+    letterSpacing: 6,
   },
   controls: {
     flexDirection: 'row',
-    gap: 16,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: '#0f172a',
-    borderWidth: 1,
-    borderColor: '#1f2937',
     alignItems: 'center',
+    gap: 12,
   },
-  buttonPrimary: {
-    backgroundColor: '#047857',
-    borderColor: '#059669',
+  controlsLandscape: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
   },
-  buttonPrimaryActive: {
-    backgroundColor: '#b45309',
-    borderColor: '#f97316',
-  },
-  buttonLabel: {
-    color: '#e2e8f0',
-    fontWeight: '600',
+  latency: {
+    fontSize: 16,
+    letterSpacing: 1.25,
     textTransform: 'uppercase',
+  },
+  keyStatus: {
+    fontSize: 15,
+    color: '#b91c1c',
     letterSpacing: 0.5,
   },
-  buttonLabelPrimary: {
-    color: '#0f172a',
+  iconButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
 });
