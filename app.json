@@ -28,10 +28,11 @@
       "./plugins/withBluetoothScanPermissionFix"
     ],
     "ios": {
+      "bundleIdentifier": "com.leonzdev.tsla-ble-dash",
       "supportsTablet": true,
       "infoPlist": {
-        "NSBluetoothAlwaysUsageDescription": "tsla-ble-dash uses Bluetooth to connect to your Tesla vehicle dashboard.",
-        "NSBluetoothPeripheralUsageDescription": "tsla-ble-dash needs Bluetooth access to request vehicle data.",
+        "NSBluetoothAlwaysUsageDescription": "tsla-ble-dash uses Bluetooth to discover and connect to your Tesla vehicle dashboard.",
+        "NSBluetoothPeripheralUsageDescription": "tsla-ble-dash needs Bluetooth access to communicate with your Tesla vehicle dashboard.",
         "NSLocationWhenInUseUsageDescription": "Location access is required for Bluetooth scanning to find your Tesla."
       }
     },
