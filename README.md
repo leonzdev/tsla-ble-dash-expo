@@ -1,14 +1,13 @@
 # tsla-ble-dash-expo
 
-An Expo-powered native port of [tsla-ble-dash](https://github.com/leonzdev/tsla-ble-dash), focused on delivering the dashboard and debug tooling as a dedicated Android/iOS experience.
+Show your Tesla vehicle's speed on your phone.
 
 ## Features
 
-- 📟 Dashboard view that mirrors the web PWA, showing speed, gear, and key status with a touch-friendly layout toggle.
-- 🧰 Debug screen with VIN selection, BLE discovery mode control, profile management, and Tesla BLE session controls.
-- 🔑 Local profile storage (AsyncStorage) for private/public keys with secure generation via the app.
-- 🚗 BLE transport built on top of `react-native-ble-plx`, using Expo config plugins for the required permissions.
-- ♻️ Auto-refresh loop for vehicle state polling, synchronized with the dashboard controls.
+- Connect over BLE.
+- Near real-time latency.
+- Shows speed and shift.
+- Mount your phone behind the wheel and use landacape mode.
 
 ## Getting started
 
