@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import type { AccessibilityState } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useVehicleStore } from '@state/vehicleStore';
 
@@ -59,6 +60,31 @@ export function DashboardScreen() {
       });
     };
   }, [orientationSupported]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return;
+    }
+    const applyNavVisibility = async () => {
+      try {
+        if (isLandscape) {
+          await NavigationBar.setBehaviorAsync('overlay-swipe');
+          await NavigationBar.setVisibilityAsync('hidden');
+        } else {
+          await NavigationBar.setVisibilityAsync('visible');
+          await NavigationBar.setBehaviorAsync('inset-swipe');
+        }
+      } catch (error) {
+        console.warn('Failed to update navigation bar visibility', error);
+      }
+    };
+    void applyNavVisibility();
+
+    return () => {
+      NavigationBar.setVisibilityAsync('visible').catch(() => {});
+      NavigationBar.setBehaviorAsync('inset-swipe').catch(() => {});
+    };
+  }, [isLandscape]);
 
   const handleOrientationToggle = useCallback(async () => {
     const next = !isLandscape;
