@@ -2,6 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  AppState,
+  AppStateStatus,
   Platform,
   ScrollView,
   StyleSheet,
@@ -66,6 +68,7 @@ export function DebugScreen() {
   const [busyAction, setBusyAction] = useState<string | null>(null);
 
   const autoRefreshTimer = useRef<NodeJS.Timeout | null>(null);
+  const resumeFetchInFlight = useRef(false);
   const sessionRef = useRef<TeslaBleSession | null>(null);
   const sessionConfigRef = useRef<{ vin: string } | null>(null);
   const stateCategoryOptions = useMemo(() => Object.values(StateCategory) as StateCategory[], []);
@@ -418,6 +421,25 @@ export function DebugScreen() {
       }
     };
   }, [appendLog, autoRefreshActive, performVehicleStateFetch, refreshInterval, reportError]);
+
+  useEffect(() => {
+    const handleAppStateChange = (nextState: AppStateStatus) => {
+      if (nextState !== 'active' || !autoRefreshActive || resumeFetchInFlight.current) {
+        return;
+      }
+      resumeFetchInFlight.current = true;
+      performVehicleStateFetch('auto')
+        .catch((error) => reportError('Auto refresh on resume failed', error))
+        .finally(() => {
+          resumeFetchInFlight.current = false;
+        });
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => {
+      subscription.remove();
+    };
+  }, [autoRefreshActive, performVehicleStateFetch, reportError]);
 
   const handleManualFetch = useCallback(async () => {
     try {

@@ -25,7 +25,8 @@
           "bluetoothAlwaysPermission": "tsla-ble-dash needs Bluetooth access to connect to your vehicle."
         }
       ],
-      "./plugins/withBluetoothScanPermissionFix"
+      "./plugins/withBluetoothScanPermissionFix",
+      "./plugins/withTurnScreenOn"
     ],
     "ios": {
       "bundleIdentifier": "com.leonzdev.tsla-ble-dash",
