@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Text,
   View,
-  useColorScheme,
   useWindowDimensions,
 } from 'react-native';
 import type { AccessibilityState } from 'react-native';
@@ -17,9 +16,7 @@ import { useVehicleStore } from '@state/vehicleStore';
 export function DashboardScreen() {
   const [isLandscape, setIsLandscape] = useState(false);
   const orientationSupported = Platform.OS === 'ios' || Platform.OS === 'android';
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === 'dark';
-  const theme = useMemo(() => (isDarkMode ? DARK_THEME : LIGHT_THEME), [isDarkMode]);
+  const theme = useMemo(() => DARK_THEME, []);
   const { width, height } = useWindowDimensions();
   const driveState = useVehicleStore((state) => state.driveState);
   const keyLoaded = useVehicleStore((state) => state.keyLoaded);
