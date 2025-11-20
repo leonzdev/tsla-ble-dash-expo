@@ -424,11 +424,24 @@ async function ensureAndroidBlePermissions(): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
   const { PermissionsAndroid } = require('react-native') as typeof import('react-native');
 
-  const requiredPermissions: string[] = [
-    PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-    PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-  ];
+  const androidVersion =
+    typeof Platform.Version === 'number' ? Platform.Version : Number(Platform.Version) || 0;
+
+  const requiredPermissions = new Set<string>();
+  if (PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION) {
+    requiredPermissions.add(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+  }
+  if (PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION) {
+    requiredPermissions.add(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION);
+  }
+  if (androidVersion >= 31) {
+    if (PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN) {
+      requiredPermissions.add(PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN);
+    }
+    if (PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT) {
+      requiredPermissions.add(PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT);
+    }
+  }
 
   const missing: string[] = [];
   for (const permission of requiredPermissions) {
