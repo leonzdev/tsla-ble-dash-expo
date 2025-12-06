@@ -669,6 +669,7 @@ export function DebugScreen() {
           >
             <Picker.Item label="Inertial Fusion V1 (Basic)" value="fusion" />
             <Picker.Item label="Time-Realigned Fusion (V2)" value="time-realigned" />
+            <Picker.Item label="Median Latency Fusion (V3)" value="median-latency" />
             <Picker.Item label="BLE Passthrough" value="passthrough" />
           </Picker>
         </Field>

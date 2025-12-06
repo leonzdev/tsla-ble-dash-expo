@@ -14,9 +14,9 @@ interface VehicleStateStore {
   setLastLatency(latency: number | null): void;
   toggleAutoRefresh(): void;
   fusionDebugEnabled: boolean;
-  currentFusionAlgo: 'fusion' | 'passthrough' | 'time-realigned';
+  currentFusionAlgo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency';
   setFusionDebugEnabled(enabled: boolean): void;
-  setFusionAlgo(algo: 'fusion' | 'passthrough' | 'time-realigned'): void;
+  setFusionAlgo(algo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency'): void;
 }
 
 export const useVehicleStore = create<VehicleStateStore>((set, get) => ({
