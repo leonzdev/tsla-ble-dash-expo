@@ -1,54 +1,128 @@
 import { useEffect, useRef, useState } from 'react';
 import { DeviceMotion } from 'expo-sensors';
 import { useVehicleStore } from '@state/vehicleStore';
-import { FusionEngine } from '@lib/fusion/FusionEngine';
+import { FusionEngine, FusionDebugState } from '@lib/fusion/FusionEngine';
 
+/*
+ * Hook to consume Fused Speed.
+ * Now acts as a subscriber to the Singleton FusionEngine.
+ */
 export function useFusedSpeed() {
     const [fusedSpeed, setFusedSpeed] = useState<number>(0);
     const [isCalibrated, setIsCalibrated] = useState(false);
-    const engineRef = useRef<FusionEngine | null>(null);
+    const [debugState, setDebugState] = useState<FusionDebugState | null>(null);
+
+    const lastUpdateRef = useRef<number>(0);
 
     // Subscribe to Vehicle Store
     const driveState = useVehicleStore((state) => state.driveState);
+    const latencyMs = useVehicleStore((state) => state.lastLatencyMs);
     const driveData = driveState?.vehicleData?.driveState ?? driveState?.vehicleData?.drive_state ?? null;
     const rawSpeed = parseVehicleSpeed(driveData);
 
+    const fusionAlgo = useVehicleStore((state) => state.currentFusionAlgo);
+    const debugEnabled = useVehicleStore((state) => state.fusionDebugEnabled);
+
     useEffect(() => {
-        // effective update rate 50Hz
+        // Shared Engine
+        const engine = FusionEngine.getInstance();
+
+        // Ensure we are feeding sensor data
+        // We only need one active feeder for the app.
+        // However, since we are moving to components, let's keep the feeder here for now?
+        // Optimization: Only the "Primary" hook should feed? 
+        // Or just let the engine handle it.
+        // Let's implement the simpler approach: The hook subscribes. 
+        // AND the hook manages the sensor connection if it's the "Main" one?
+        // To solve the multiple-listener issue:
+        // We will move DeviceMotion INSIDE FusionEngine (via public method or internally).
+        // For now, let's allow this hook to be the "Driver".
+
+        // Note: We are refactoring to isolate components. The components WON'T use this hook.
+        // This hook will effectively be deprecated or used only by the invisible "Controller" component.
+
+        // Let's assume we place a <FusionController /> or similar in the layout.
+        // OR we just leave this hook running in DashboardScreen (which we wanted to avoid re-rendering).
+
+        // WAIT. If DashboardScreen uses this hook, it re-renders.
+        // So DashboardScreen CANNOT use this hook.
+
+        // New Plan:
+        // 1. DashboardScreen renders <SpeedReadout />.
+        // 2. <SpeedReadout /> uses this hook.
+        // 3. This hook subscribes to Engine.
+        // 4. Engine updates.
+        // 5. <SpeedReadout /> re-renders (15Hz).
+        // 6. DashboardScreen (parent) DOES NOT re-render.
+
+        // So this hook implementation is fine. We just need to stop using it in the Parent.
+
+        // But who feeds the sensors?
+        // If <SpeedReadout> feeds sensors, it works when component is mounted.
+        // Ensure permissions
+        DeviceMotion.requestPermissionsAsync().then(({ status }) => {
+            if (status !== 'granted') {
+                console.warn('Sensor permissions denied');
+            }
+        });
+
         DeviceMotion.setUpdateInterval(20);
-
-        const engine = new FusionEngine(
-            (speed) => setFusedSpeed(speed),
-            (calibrated) => setIsCalibrated(calibrated)
-        );
-        engine.start();
-        engineRef.current = engine;
-
         const subscription = DeviceMotion.addListener((event) => {
             if (event.acceleration) {
-                // DeviceMotion.acceleration gives acceleration WITHOUT gravity
-                // units are m/s^2
                 engine.handleMotionUpdate(event.acceleration);
             }
         });
 
+        const unsubscribeSpeed = engine.subscribe((speed) => {
+            // Throttling for UI: 15Hz
+            const now = Date.now();
+            if (now - lastUpdateRef.current > 66) {
+                setFusedSpeed(speed);
+                lastUpdateRef.current = now;
+            }
+        });
+
+        const unsubscribeCalib = engine.subscribeCalibration((calib) => {
+            setIsCalibrated(calib);
+        });
+
         return () => {
             subscription.remove();
-            engine.stop();
+            unsubscribeSpeed();
+            unsubscribeCalib();
         };
     }, []);
 
-    // Feed BLE updates to engine
+    // Debug Loop
     useEffect(() => {
-        if (engineRef.current && rawSpeed != null) {
-            engineRef.current.addBleMeasurement(rawSpeed);
+        if (!debugEnabled) {
+            setDebugState(null);
+            return;
         }
-    }, [rawSpeed]);
+        const engine = FusionEngine.getInstance();
+        const debugTimer = setInterval(() => {
+            setDebugState(engine.getDebugState());
+        }, 100);
+        return () => clearInterval(debugTimer);
+    }, [debugEnabled]);
+
+    // Sync Algo
+    useEffect(() => {
+        FusionEngine.getInstance().setAlgorithm(fusionAlgo);
+    }, [fusionAlgo]);
+
+    // Feed BLE
+    useEffect(() => {
+        if (rawSpeed != null) {
+            FusionEngine.getInstance().addBleMeasurement(rawSpeed, latencyMs ?? 0);
+        }
+    }, [rawSpeed, latencyMs]);
 
     return {
         speed: fusedSpeed,
         isCalibrated,
-        rawSpeed // Expose raw for debugging/comparison
+        rawSpeed,
+        debugState
     };
 }
 

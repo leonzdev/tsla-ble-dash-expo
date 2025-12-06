@@ -79,6 +79,10 @@ export function DebugScreen() {
   const setStoreLatency = useVehicleStore((state) => state.setLastLatency);
   const autoRefreshActive = useVehicleStore((state) => state.autoRefreshActive);
   const setStoreAutoRefreshActive = useVehicleStore((state) => state.setAutoRefreshActive);
+  const fusionDebugEnabled = useVehicleStore((state) => state.fusionDebugEnabled);
+  const setFusionDebugEnabled = useVehicleStore((state) => state.setFusionDebugEnabled);
+  const currentFusionAlgo = useVehicleStore((state) => state.currentFusionAlgo);
+  const setFusionAlgo = useVehicleStore((state) => state.setFusionAlgo);
 
   useEffect(() => {
     setStoreVin(vin ? vin : null);
@@ -118,7 +122,7 @@ export function DebugScreen() {
       if (autoRefreshTimer.current) {
         clearTimeout(autoRefreshTimer.current);
       }
-      sessionRef.current?.disconnect().catch(() => {});
+      sessionRef.current?.disconnect().catch(() => { });
     };
   }, []);
 
@@ -142,7 +146,7 @@ export function DebugScreen() {
     }
     const current = sessionConfigRef.current;
     if (!sessionRef.current || !current || current.vin !== normalizedVin) {
-      sessionRef.current?.disconnect().catch(() => {});
+      sessionRef.current?.disconnect().catch(() => { });
       sessionRef.current = new TeslaBleSession({
         vin: normalizedVin,
         deviceDiscoveryMode: DEFAULT_DISCOVERY_MODE,
@@ -211,7 +215,7 @@ export function DebugScreen() {
             item.id === profile.id ? { ...item, publicKeyPem: refreshedPublic } : item,
           );
           setProfiles(updated);
-          persistProfiles(updated).catch(() => {});
+          persistProfiles(updated).catch(() => { });
           setPublicKeyPem(refreshedPublic);
           appendLog(`Profile "${profile.name}" public key refreshed.`);
         } else {
@@ -456,7 +460,7 @@ export function DebugScreen() {
     (value: string) => {
       const sanitized = sanitizeRefreshInterval(value);
       setRefreshInterval(sanitized);
-      AsyncStorage.setItem(REFRESH_INTERVAL_STORAGE_KEY, String(sanitized)).catch(() => {});
+      AsyncStorage.setItem(REFRESH_INTERVAL_STORAGE_KEY, String(sanitized)).catch(() => { });
     },
     [],
   );
@@ -645,6 +649,29 @@ export function DebugScreen() {
           />
         </View>
         <Text style={styles.logOutput}>{stateOutput}</Text>
+      </View>
+
+      <Text style={styles.heading}>Sensor Fusion</Text>
+      <View style={styles.fieldGroup}>
+        <View style={styles.toggleRow}>
+          <Text style={styles.toggleLabel}>Debug Overlay</Text>
+          <Switch
+            value={fusionDebugEnabled}
+            onValueChange={setFusionDebugEnabled}
+          />
+        </View>
+        <Field label="Algorithm">
+          <Picker
+            selectedValue={currentFusionAlgo}
+            onValueChange={(val) => setFusionAlgo(val as any)}
+            dropdownIconColor="#94a3b8"
+            style={styles.picker}
+          >
+            <Picker.Item label="Inertial Fusion V1 (Basic)" value="fusion" />
+            <Picker.Item label="Time-Realigned Fusion (V2)" value="time-realigned" />
+            <Picker.Item label="BLE Passthrough" value="passthrough" />
+          </Picker>
+        </Field>
       </View>
 
       <Text style={styles.heading}>Log</Text>

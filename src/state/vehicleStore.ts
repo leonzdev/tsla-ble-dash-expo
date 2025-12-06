@@ -13,6 +13,10 @@ interface VehicleStateStore {
   setAutoRefreshActive(active: boolean): void;
   setLastLatency(latency: number | null): void;
   toggleAutoRefresh(): void;
+  fusionDebugEnabled: boolean;
+  currentFusionAlgo: 'fusion' | 'passthrough' | 'time-realigned';
+  setFusionDebugEnabled(enabled: boolean): void;
+  setFusionAlgo(algo: 'fusion' | 'passthrough' | 'time-realigned'): void;
 }
 
 export const useVehicleStore = create<VehicleStateStore>((set, get) => ({
@@ -30,4 +34,8 @@ export const useVehicleStore = create<VehicleStateStore>((set, get) => ({
     const current = get().autoRefreshActive;
     set({ autoRefreshActive: !current });
   },
+  fusionDebugEnabled: false,
+  currentFusionAlgo: 'fusion',
+  setFusionDebugEnabled: (enabled) => set({ fusionDebugEnabled: enabled }),
+  setFusionAlgo: (algo) => set({ currentFusionAlgo: algo }),
 }));
