@@ -13,6 +13,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useVehicleStore } from '@state/vehicleStore';
+import { useFusedSpeed } from '@hooks/useFusedSpeed';
 
 export function DashboardScreen() {
   const [isLandscape, setIsLandscape] = useState(false);
@@ -28,11 +29,15 @@ export function DashboardScreen() {
   const driveData = driveState?.vehicleData?.driveState ?? driveState?.vehicleData?.drive_state ?? null;
 
   const shortestSide = Math.min(width, height);
-  const speed = useMemo(() => parseVehicleSpeed(driveData), [driveData]);
+  const { speed, isCalibrated } = useFusedSpeed();
   const gear = useMemo(() => formatShiftState(driveData?.shiftState ?? driveData?.shift_state), [driveData]);
   const latencyText = useMemo(() => formatLatencyDisplay(latencyMs), [latencyMs]);
   const latencyColor = useMemo(() => latencyColorForValue(latencyMs), [latencyMs]);
   const speedText = formatSpeedDisplay(speed);
+  // Dim speed slightly if not calibrated yet to indicate "raw/untrusted" fusion state, or just use default.
+  // We'll just stick to default color but maybe add a debug dot if needed. 
+  // For now, let's just let it be seamless.
+  const speedColor = isCalibrated ? theme.speedText : theme.speedText;
   const speedFontSize = shortestSide * 0.9;
   const orientationIconColor = isLandscape ? theme.orientationIconActive : theme.orientationIcon;
   const orientationOutlineColor = isLandscape ? theme.orientationIconActive : undefined;
@@ -81,8 +86,8 @@ export function DashboardScreen() {
     void applyNavVisibility();
 
     return () => {
-      NavigationBar.setVisibilityAsync('visible').catch(() => {});
-      NavigationBar.setBehaviorAsync('inset-swipe').catch(() => {});
+      NavigationBar.setVisibilityAsync('visible').catch(() => { });
+      NavigationBar.setBehaviorAsync('inset-swipe').catch(() => { });
     };
   }, [isLandscape]);
 
@@ -149,7 +154,7 @@ export function DashboardScreen() {
           <View style={[styles.readoutRow, isLandscape && styles.readoutRowLandscape]}>
             <View style={styles.speedWrapper}>
               <Text
-                style={[styles.speed, { fontSize: speedFontSize, color: theme.speedText }]}
+                style={[styles.speed, { fontSize: speedFontSize, color: speedColor, opacity: isCalibrated ? 1 : 0.7 }]}
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 minimumFontScale={0.2}
@@ -213,7 +218,7 @@ export function DashboardScreen() {
             <Text
               style={[styles.latency, { color: latencyColor, textShadowColor: theme.latencyShadow }]}
             >
-              {latencyText}
+              {latencyText} {isCalibrated ? '•' : ''}
             </Text>
           </View>
 
