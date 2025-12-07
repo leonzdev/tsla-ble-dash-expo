@@ -38,6 +38,7 @@ const SPEED_DECAY = 0.9995;
 // Slope Correction Constants
 const BIAS_LEARNING_RATE = 0.05; // Low-pass filter alpha for bias
 const PROPORTIONAL_GAIN = 0.15;
+const SENSOR_SYNC_SLOP = 200; // Tolerance for sensor timestamp mismatch
 
 /*
  * Base Class for Inertial Physics & Calibration
@@ -221,6 +222,7 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         if (sensorAccel === null) return; // Not enough data
 
         // The error implies Bias. 
+        // The error implies Bias.
         // We defined TrueAccel = SensorAccel + Bias.
         // So BleAccel ~= SensorAccel + Bias.
         // => BiasTarget = BleAccel - SensorAccel.
@@ -246,8 +248,11 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         const fy = this.forwardVector.y;
         const fz = this.forwardVector.z;
 
+        // Use SLOP to catch sensor data that arrived slightly 'late' (processed after BLE event backdate)
+        const effectiveEnd = endTime + SENSOR_SYNC_SLOP;
+
         for (const item of this.recentAccels) {
-            if (item.time >= startTime && item.time <= endTime) {
+            if (item.time >= startTime && item.time <= effectiveEnd) {
                 const dot = (item.vec.x * fx) + (item.vec.y * fy) + (item.vec.z * fz);
                 sum += dot;
                 count++;
@@ -259,8 +264,8 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
             return sum / count;
         }
 
-        // Fallback: if no points in exact window (rare), take nearest? 
-        // Or assume constant. 
+        // Fallback: if no points in exact window (rare), take nearest?
+        // Or assume constant.
         // For robustness, return null and skip update.
         return null;
     }
@@ -278,8 +283,10 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
 
         if (rawAccel > 1.0 && latest.speed > MIN_CALIBRATION_SPEED) {
             let sumX = 0, sumY = 0, sumZ = 0, count = 0;
+            const effectiveEnd = latest.time + SENSOR_SYNC_SLOP;
+
             for (const item of this.recentAccels) {
-                if (item.time >= prev.time && item.time <= latest.time) {
+                if (item.time >= prev.time && item.time <= effectiveEnd) {
                     sumX += item.vec.x;
                     sumY += item.vec.y;
                     sumZ += item.vec.z;
