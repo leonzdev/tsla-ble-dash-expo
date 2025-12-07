@@ -13,6 +13,9 @@ export function FusionDebugOverlay() {
             <Text style={styles.debugText}>BLE: {debugState.bleSpeed?.toFixed(1)}</Text>
             <Text style={styles.debugText}>FUSED: {debugState.fusedSpeed?.toFixed(1)}</Text>
             <Text style={styles.debugText}>ACCEL: {debugState.accelerationMps2?.toFixed(2)}</Text>
+            {debugState.gradePercent != null && (
+                <Text style={styles.debugText}>GRADE: {debugState.gradePercent.toFixed(1)}%</Text>
+            )}
             <Text style={styles.debugText}>SCALE: {debugState.conversionFactor?.toFixed(3)}</Text>
         </View>
     );

@@ -20,6 +20,7 @@ export function useFusedSpeed() {
     const algoParams = useVehicleStore(state => state.fusionAlgoParams);
     const latencyMs = useVehicleStore((state) => state.lastLatencyMs);
     const debugEnabled = useVehicleStore((state) => state.fusionDebugEnabled);
+    const slopeCorrectionEnabled = useVehicleStore((state) => state.slopeCorrectionEnabled);
     const driveData = driveState?.vehicleData?.driveState ?? driveState?.vehicleData?.drive_state ?? null;
     const rawSpeed = parseVehicleSpeed(driveData);
 
@@ -109,8 +110,11 @@ export function useFusedSpeed() {
     // Sync Algo
     useEffect(() => {
         const params = algoParams[activeAlgo];
-        FusionEngine.getInstance().setAlgorithm(activeAlgo, params);
-    }, [activeAlgo, algoParams]);
+        FusionEngine.getInstance().setAlgorithm(activeAlgo, {
+            ...params,
+            slopeCorrectionEnabled: slopeCorrectionEnabled
+        });
+    }, [activeAlgo, algoParams, slopeCorrectionEnabled]);
 
     // Feed BLE
     useEffect(() => {

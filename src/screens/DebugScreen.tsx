@@ -126,6 +126,8 @@ export function DebugScreen({ onClose }: DebugScreenProps) {
   const setFusionDebugEnabled = useVehicleStore((state) => state.setFusionDebugEnabled);
   const currentFusionAlgo = useVehicleStore((state) => state.currentFusionAlgo);
   const setFusionAlgo = useVehicleStore((state) => state.setFusionAlgo);
+  const slopeCorrectionEnabled = useVehicleStore((state) => state.slopeCorrectionEnabled);
+  const setSlopeCorrectionEnabled = useVehicleStore((state) => state.setSlopeCorrectionEnabled);
 
   const theme = useMemo(() => ({
     text: '#f8fafc',
@@ -726,6 +728,13 @@ export function DebugScreen({ onClose }: DebugScreenProps) {
               <Picker.Item label="BLE Passthrough" value="passthrough" />
             </Picker>
           </Field>
+          <View style={styles.toggleRow}>
+            <Text style={styles.toggleLabel}>Slope Correction</Text>
+            <Switch
+              value={slopeCorrectionEnabled}
+              onValueChange={setSlopeCorrectionEnabled}
+            />
+          </View>
 
         </View>
 

@@ -11,6 +11,7 @@ export interface FusionDebugState {
     isCalibrated: boolean;
     conversionFactor: number;
     accelerationMps2?: number;
+    gradePercent?: number;
 }
 
 export type SpeedUpdateCallback = (speed: number) => void;
@@ -22,7 +23,6 @@ export type CalibrationCallback = (isCalibrated: boolean) => void;
 export interface FusionAlgorithm {
     name: string;
     reset(): void;
-    // Generic configuration injection
     setParams(params: any): void;
     pushMotion(accel: Vector3, timestamp: number): void;
     pushBle(speed: number, arrivalTime: number, latencyMs: number): void;
@@ -34,6 +34,10 @@ const MIN_CALIBRATION_SPEED = 5;
 const MIN_SENSOR_ACCEL = 0.5;
 const FILTER_GAIN_BLE = 0.15;
 const SPEED_DECAY = 0.9995;
+
+// Slope Correction Constants
+const BIAS_LEARNING_RATE = 0.05; // Low-pass filter alpha for bias
+const PROPORTIONAL_GAIN = 0.15;
 
 /*
  * Base Class for Inertial Physics & Calibration
@@ -49,6 +53,10 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
     protected speedConversionFactor: number = 0.44704;
     protected isCalibrated: boolean = false;
 
+    // Slope Correction State
+    protected accelBias: number = 0;
+    protected prevCorrectionPoint: { speedMps: number; time: number } | null = null;
+
     protected recentAccels: { vec: Vector3; time: number }[] = [];
     protected bleSpeedHistory: { speed: number; time: number }[] = [];
 
@@ -63,19 +71,25 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         this.recentAccels = [];
         this.bleSpeedHistory = [];
         this.lastEffectiveAccel = 0;
+        this.accelBias = 0;
+        this.prevCorrectionPoint = null;
         this.onReset();
     }
 
-    // Default implementation stores params
     setParams(params: any) {
         this.params = params || {};
+        // If slope correction disabled, reset bias
+        if (!this.params.slopeCorrectionEnabled) {
+            this.accelBias = 0;
+            this.prevCorrectionPoint = null;
+        }
     }
 
     protected onReset() { }
 
     pushMotion(accel: Vector3, timestamp: number) {
         this.recentAccels.push({ vec: accel, time: timestamp });
-        const cutoff = timestamp - 2000;
+        const cutoff = timestamp - 3000; // Keep slightly more history for lookback averaging
         while (this.recentAccels.length > 0 && this.recentAccels[0].time < cutoff) {
             this.recentAccels.shift();
         }
@@ -94,6 +108,7 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         const effectiveAccel = this.computeInstantAcceleration();
         this.lastEffectiveAccel = effectiveAccel;
 
+        // Apply Physics
         this.currentSpeedMps += effectiveAccel * dt;
         this.currentSpeedMps *= SPEED_DECAY;
 
@@ -114,12 +129,13 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         }
 
         return {
-            algorithmName: this.name,
+            algorithmName: this.name + (this.params.slopeCorrectionEnabled ? ' (+Slope)' : ''),
             bleSpeed: this.lastBleSpeedRaw,
             fusedSpeed: this.emitSpeed(),
             isCalibrated: this.isCalibrated,
             conversionFactor: this.speedConversionFactor,
-            accelerationMps2: displayAccel
+            accelerationMps2: displayAccel,
+            gradePercent: (this.accelBias / 9.81) * 100
         };
     }
 
@@ -127,6 +143,7 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         return this.currentSpeedMps / this.speedConversionFactor;
     }
 
+    // Physics Engine: Returns "True Forward Acceleration" (Sensor + Correction)
     protected computeInstantAcceleration(): number {
         if (!this.forwardVector || this.recentAccels.length === 0) return 0;
 
@@ -135,11 +152,117 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         const fy = this.forwardVector.y;
         const fz = this.forwardVector.z;
 
-        const forwardAccelMps2 = (latest.x * fx) + (latest.y * fy) + (latest.z * fz);
-        if (Math.abs(forwardAccelMps2) > 0.1) {
-            return forwardAccelMps2;
+        // Sensor Accel (measures gravity as deceleration if uphill!)
+        let sensorForwardAccel = (latest.x * fx) + (latest.y * fy) + (latest.z * fz);
+
+        // Correct for Bias: TrueAccel = SensorAccel + Bias
+        // (Bias represents the missing 'g * sin(slope)' component)
+        let trueAccel = sensorForwardAccel;
+        if (this.params.slopeCorrectionEnabled) {
+            trueAccel += this.accelBias;
+        }
+
+        if (Math.abs(trueAccel) > 0.1) {
+            return trueAccel;
         }
         return 0;
+    }
+
+    /*
+     * Feedback Loop
+     * Now accepts 'captureTime' to perform acceleration-window matching.
+     */
+    protected applyFeedback(diff: number, rawBleMps: number, captureTime: number) {
+        // Safety: If huge divergence, hard reset
+        if (Math.abs(diff) > 5.0) {
+            this.currentSpeedMps = rawBleMps;
+            if (this.params.slopeCorrectionEnabled) {
+                // Soft reset bias, don't zero it completely as we might still be on the hill
+                this.accelBias *= 0.5;
+            }
+            this.prevCorrectionPoint = { speedMps: rawBleMps, time: captureTime };
+            return;
+        }
+
+        // 1. Proportional Correction (Fast)
+        // Corrects the integration drift of speed
+        this.currentSpeedMps += diff * PROPORTIONAL_GAIN;
+
+        // 2. Slope/Bias Correction (Slow)
+        if (this.params.slopeCorrectionEnabled) {
+            this.updateSlopeBias(rawBleMps, captureTime);
+        }
+
+        // Clamp Speed
+        if (this.currentSpeedMps < 0) this.currentSpeedMps = 0;
+    }
+
+    /*
+     * V5.1 Logic: Acceleration-Based Bias Learning
+     */
+    private updateSlopeBias(currentSpeedMps: number, currentTime: number) {
+        const prev = this.prevCorrectionPoint;
+        // Update previous point for next time
+        this.prevCorrectionPoint = { speedMps: currentSpeedMps, time: currentTime };
+
+        if (!prev) return;
+
+        const dtMs = currentTime - prev.time;
+        // Require at least 200ms window to be significant
+        if (dtMs < 200) return;
+
+        const dtSec = dtMs / 1000;
+
+        // True Average Accel (from BLE)
+        const bleAccel = (currentSpeedMps - prev.speedMps) / dtSec;
+
+        // Sensor Average Accel (what we thought happened)
+        const sensorAccel = this.computeAverageSensorAccel(prev.time, currentTime);
+        if (sensorAccel === null) return; // Not enough data
+
+        // The error implies Bias. 
+        // We defined TrueAccel = SensorAccel + Bias.
+        // So BleAccel ~= SensorAccel + Bias.
+        // => BiasTarget = BleAccel - SensorAccel.
+        const biasTarget = bleAccel - sensorAccel;
+
+        // Apply Low Pass Filter to Bias
+        // bias = old + alpha * (target - old)
+        this.accelBias += BIAS_LEARNING_RATE * (biasTarget - this.accelBias);
+
+        // Clamp Bias (limit to ~ +/- 3 m/s^2 or ~17 deg slope)
+        if (this.accelBias > 3.0) this.accelBias = 3.0;
+        if (this.accelBias < -3.0) this.accelBias = -3.0;
+    }
+
+    // Average sensor readings over a historical time window [start, end]
+    private computeAverageSensorAccel(startTime: number, endTime: number): number | null {
+        if (!this.forwardVector || this.recentAccels.length === 0) return null;
+
+        let sum = 0;
+        let count = 0;
+
+        const fx = this.forwardVector.x;
+        const fy = this.forwardVector.y;
+        const fz = this.forwardVector.z;
+
+        for (const item of this.recentAccels) {
+            if (item.time >= startTime && item.time <= endTime) {
+                const dot = (item.vec.x * fx) + (item.vec.y * fy) + (item.vec.z * fz);
+                sum += dot;
+                count++;
+            }
+        }
+
+        // If we found data points
+        if (count > 0) {
+            return sum / count;
+        }
+
+        // Fallback: if no points in exact window (rare), take nearest? 
+        // Or assume constant. 
+        // For robustness, return null and skip update.
+        return null;
     }
 
     protected attemptCalibration() {
@@ -207,13 +330,8 @@ class InertialFusionAlgorithm extends BaseInertialAlgorithm {
         const bleSpeedMps = rawSpeed * this.speedConversionFactor;
         const diff = bleSpeedMps - this.currentSpeedMps;
 
-        if (Math.abs(diff) > 5.0) {
-            this.currentSpeedMps = bleSpeedMps;
-        } else {
-            this.currentSpeedMps += diff * FILTER_GAIN_BLE;
-        }
-
-        if (this.currentSpeedMps < 0) this.currentSpeedMps = 0;
+        // V1 uses 'arrivalTime' as capture time (no latency comp)
+        this.applyFeedback(diff, bleSpeedMps, arrivalTime);
     }
 }
 
@@ -226,6 +344,7 @@ class TimeRealignedFusionAlgorithm extends BaseInertialAlgorithm {
     protected outputHistory: { speedMps: number; time: number }[] = [];
 
     protected onReset() {
+        super.onReset();
         this.outputHistory = [];
     }
 
@@ -236,7 +355,6 @@ class TimeRealignedFusionAlgorithm extends BaseInertialAlgorithm {
     pushBle(rawSpeed: number, arrivalTime: number, latencyMs: number) {
         if (rawSpeed == null || isNaN(rawSpeed)) return;
 
-        // Capture time is simply arrival minus the reported latency
         const captureTime = arrivalTime - latencyMs;
 
         this.lastBleSpeedRaw = rawSpeed;
@@ -259,16 +377,7 @@ class TimeRealignedFusionAlgorithm extends BaseInertialAlgorithm {
             diff = bleSpeedMps - this.currentSpeedMps;
         }
 
-        this.applyCorrection(diff, bleSpeedMps);
-    }
-
-    protected applyCorrection(diff: number, rawBleMps: number) {
-        if (Math.abs(diff) > 5.0) {
-            this.currentSpeedMps = rawBleMps;
-        } else {
-            this.currentSpeedMps += diff * FILTER_GAIN_BLE;
-        }
-        if (this.currentSpeedMps < 0) this.currentSpeedMps = 0;
+        this.applyFeedback(diff, bleSpeedMps, captureTime);
     }
 
     protected recordHistory(speedMps: number, time: number) {
@@ -303,7 +412,7 @@ class TimeRealignedFusionAlgorithm extends BaseInertialAlgorithm {
 class MedianLatencyFusionAlgorithm extends TimeRealignedFusionAlgorithm {
     public name = 'Median Latency Fusion (V3)';
 
-    private latencyHistory: number[] = [];
+    protected latencyHistory: number[] = [];
 
     protected onReset() {
         super.onReset();
@@ -346,7 +455,7 @@ class MedianLatencyFusionAlgorithm extends TimeRealignedFusionAlgorithm {
             diff = bleSpeedMps - this.currentSpeedMps;
         }
 
-        this.applyCorrection(diff, bleSpeedMps);
+        this.applyFeedback(diff, bleSpeedMps, captureTime);
     }
 }
 
@@ -359,11 +468,9 @@ class FixedLookbackFusionAlgorithm extends TimeRealignedFusionAlgorithm {
     pushBle(rawSpeed: number, arrivalTime: number, latencyMs: number) {
         if (rawSpeed == null || isNaN(rawSpeed)) return;
 
-        // Use configured lookback, default to 400ms if not set
         const lookback = this.params.lookbackMs ?? 400;
         const captureTime = arrivalTime - lookback;
 
-        // Same boilerplate as V2/V3 from here
         this.lastBleSpeedRaw = rawSpeed;
         this.bleSpeedHistory.push({ speed: rawSpeed, time: captureTime });
         if (this.bleSpeedHistory.length > 5) {
@@ -384,21 +491,20 @@ class FixedLookbackFusionAlgorithm extends TimeRealignedFusionAlgorithm {
             diff = bleSpeedMps - this.currentSpeedMps;
         }
 
-        this.applyCorrection(diff, bleSpeedMps);
+        this.applyFeedback(diff, bleSpeedMps, captureTime);
     }
 
     getDebugState(): FusionDebugState {
         const base = super.getDebugState();
         return {
             ...base,
-            algorithmName: `Fixed Lookback (${this.params.lookbackMs ?? 400}ms)`
+            algorithmName: `Fixed Lookback (${this.params.lookbackMs ?? 400}ms)` + (this.params.slopeCorrectionEnabled ? ' (+Slope)' : '')
         };
     }
 }
 
-
 /*
- * Algorithm 5: Passthrough
+ * Algorithm 6 (Passthrough)
  */
 class PassthroughAlgorithm implements FusionAlgorithm {
     public name = 'Passthrough (BLE Only)';
@@ -424,7 +530,8 @@ class PassthroughAlgorithm implements FusionAlgorithm {
             fusedSpeed: this.lastSpeed,
             isCalibrated: true,
             conversionFactor: 1.0,
-            accelerationMps2: 0
+            accelerationMps2: 0,
+            gradePercent: 0
         };
     }
 }
@@ -473,6 +580,7 @@ export class FusionEngine {
 
     public setAlgorithm(type: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback', params?: any) {
         this.algorithm.reset();
+
         switch (type) {
             case 'passthrough':
                 this.algorithm = new PassthroughAlgorithm();
