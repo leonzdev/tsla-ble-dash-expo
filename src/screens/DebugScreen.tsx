@@ -11,7 +11,12 @@ import {
   Text,
   TextInput,
   View,
+  TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Slider from '@react-native-community/slider';
+import { MaterialIcons } from '@expo/vector-icons';
 import {
   TeslaBleSession,
   StateCategory,
@@ -51,7 +56,45 @@ interface StoredProfile {
 
 type AutoRefreshMode = 'manual' | 'auto';
 
-export function DebugScreen() {
+interface DebugScreenProps {
+  onClose?: () => void;
+}
+
+function ParameterConfig({ theme }: { theme: any }) {
+  const activeAlgo = useVehicleStore(state => state.currentFusionAlgo);
+  const params = useVehicleStore(state => state.fusionAlgoParams);
+  const setParam = useVehicleStore(state => state.setAlgoParam);
+
+  if (activeAlgo === 'fixed-lookback') {
+    const currentLookback = params['fixed-lookback']?.lookbackMs ?? 400;
+
+    return (
+      <View style={styles.configContainer}>
+        <Text style={[styles.configTitle, { color: theme.text }]}>Configuration</Text>
+        <View style={styles.configRow}>
+          <Text style={[styles.configLabel, { color: theme.textSecondary }]}>
+            Lookback: {currentLookback}ms
+          </Text>
+          <Slider
+            style={{ width: '100%', height: 40 }}
+            minimumValue={0}
+            maximumValue={2000}
+            step={50}
+            value={currentLookback}
+            onValueChange={(val: number) => setParam('fixed-lookback', 'lookbackMs', val)}
+            minimumTrackTintColor={theme.accent}
+            maximumTrackTintColor={theme.cardBorder}
+            thumbTintColor={theme.accent}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  return null;
+}
+
+export function DebugScreen({ onClose }: DebugScreenProps) {
   const [vin, setVin] = useState('');
   const [profileName, setProfileName] = useState('');
   const [profiles, setProfiles] = useState<StoredProfile[]>([]);
@@ -83,6 +126,14 @@ export function DebugScreen() {
   const setFusionDebugEnabled = useVehicleStore((state) => state.setFusionDebugEnabled);
   const currentFusionAlgo = useVehicleStore((state) => state.currentFusionAlgo);
   const setFusionAlgo = useVehicleStore((state) => state.setFusionAlgo);
+
+  const theme = useMemo(() => ({
+    text: '#f8fafc',
+    textSecondary: '#c7d2fe',
+    accent: '#6366f1',
+    cardBackground: '#0f172a',
+    cardBorder: '#1f2937',
+  }), []);
 
   useEffect(() => {
     setStoreVin(vin ? vin : null);
@@ -670,9 +721,19 @@ export function DebugScreen() {
             <Picker.Item label="Inertial Fusion V1 (Basic)" value="fusion" />
             <Picker.Item label="Time-Realigned Fusion (V2)" value="time-realigned" />
             <Picker.Item label="Median Latency Fusion (V3)" value="median-latency" />
+            <Picker.Item label="Fixed Lookback (V4)" value="fixed-lookback" />
             <Picker.Item label="BLE Passthrough" value="passthrough" />
           </Picker>
         </Field>
+
+        <ParameterConfig theme={theme} />
+
+        <TouchableOpacity
+          style={[styles.closeButton, { backgroundColor: theme.cardBackground }]}
+          onPress={onClose}
+        >
+          <MaterialIcons name="close" size={24} color={theme.text} />
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.heading}>Log</Text>
@@ -822,9 +883,46 @@ const styles = StyleSheet.create({
     color: '#e2e8f0',
     backgroundColor: '#020617',
     borderRadius: 10,
-    padding: 12,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
+  },
+  configContainer: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 12,
+  },
+  configTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  configRow: {
+    marginBottom: 10,
+  },
+  configLabel: {
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: 'rgba(255,255,255,0.1)',
+    zIndex: 10,
+  },
+  fieldLabel: {
+    fontSize: 12,
+    textTransform: 'uppercase',
+    color: '#94a3b8',
+    marginBottom: 8,
   },
   deviceInfoLabel: {
     color: '#c7d2fe',

@@ -16,12 +16,12 @@ export function useFusedSpeed() {
 
     // Subscribe to Vehicle Store
     const driveState = useVehicleStore((state) => state.driveState);
+    const activeAlgo = useVehicleStore(state => state.currentFusionAlgo);
+    const algoParams = useVehicleStore(state => state.fusionAlgoParams);
     const latencyMs = useVehicleStore((state) => state.lastLatencyMs);
+    const debugEnabled = useVehicleStore((state) => state.fusionDebugEnabled);
     const driveData = driveState?.vehicleData?.driveState ?? driveState?.vehicleData?.drive_state ?? null;
     const rawSpeed = parseVehicleSpeed(driveData);
-
-    const fusionAlgo = useVehicleStore((state) => state.currentFusionAlgo);
-    const debugEnabled = useVehicleStore((state) => state.fusionDebugEnabled);
 
     useEffect(() => {
         // Shared Engine
@@ -108,8 +108,9 @@ export function useFusedSpeed() {
 
     // Sync Algo
     useEffect(() => {
-        FusionEngine.getInstance().setAlgorithm(fusionAlgo);
-    }, [fusionAlgo]);
+        const params = algoParams[activeAlgo];
+        FusionEngine.getInstance().setAlgorithm(activeAlgo, params);
+    }, [activeAlgo, algoParams]);
 
     // Feed BLE
     useEffect(() => {

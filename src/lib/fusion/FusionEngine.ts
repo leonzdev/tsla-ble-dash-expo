@@ -22,8 +22,9 @@ export type CalibrationCallback = (isCalibrated: boolean) => void;
 export interface FusionAlgorithm {
     name: string;
     reset(): void;
+    // Generic configuration injection
+    setParams(params: any): void;
     pushMotion(accel: Vector3, timestamp: number): void;
-    // Updated signature: now takes arrivalTime and latencyMs explicitly
     pushBle(speed: number, arrivalTime: number, latencyMs: number): void;
     update(dt: number): number;
     getDebugState(): FusionDebugState;
@@ -39,6 +40,7 @@ const SPEED_DECAY = 0.9995;
  */
 abstract class BaseInertialAlgorithm implements FusionAlgorithm {
     public abstract name: string;
+    protected params: any = {};
 
     protected currentSpeedMps: number = 0;
     protected lastBleSpeedRaw: number = 0;
@@ -62,6 +64,11 @@ abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         this.bleSpeedHistory = [];
         this.lastEffectiveAccel = 0;
         this.onReset();
+    }
+
+    // Default implementation stores params
+    setParams(params: any) {
+        this.params = params || {};
     }
 
     protected onReset() { }
@@ -198,7 +205,6 @@ class InertialFusionAlgorithm extends BaseInertialAlgorithm {
         }
 
         const bleSpeedMps = rawSpeed * this.speedConversionFactor;
-        // V1 Logic: Compare against CURRENT state, ignore latency
         const diff = bleSpeedMps - this.currentSpeedMps;
 
         if (Math.abs(diff) > 5.0) {
@@ -243,7 +249,6 @@ class TimeRealignedFusionAlgorithm extends BaseInertialAlgorithm {
             this.attemptCalibration();
         }
 
-        // V2 Logic: Compare against HISTORICAL state at capture time
         const estimatedAtTime = this.getEstimatedSpeedAt(captureTime);
         const bleSpeedMps = rawSpeed * this.speedConversionFactor;
 
@@ -308,23 +313,19 @@ class MedianLatencyFusionAlgorithm extends TimeRealignedFusionAlgorithm {
     pushBle(rawSpeed: number, arrivalTime: number, latencyMs: number) {
         if (rawSpeed == null || isNaN(rawSpeed)) return;
 
-        // 1. Buffer Latency
         this.latencyHistory.push(latencyMs);
         if (this.latencyHistory.length > 10) {
             this.latencyHistory.shift();
         }
 
-        // 2. Compute Median Latency
         const sorted = [...this.latencyHistory].sort((a, b) => a - b);
         const mid = Math.floor(sorted.length / 2);
         const medianLatency = sorted.length % 2 !== 0
             ? sorted[mid]
             : (sorted[mid - 1] + sorted[mid]) / 2;
 
-        // 3. Use Median for Capture Time
         const captureTime = arrivalTime - medianLatency;
 
-        // 4. Standard V2 Logic from here down
         this.lastBleSpeedRaw = rawSpeed;
         this.bleSpeedHistory.push({ speed: rawSpeed, time: captureTime });
         if (this.bleSpeedHistory.length > 5) {
@@ -349,15 +350,62 @@ class MedianLatencyFusionAlgorithm extends TimeRealignedFusionAlgorithm {
     }
 }
 
+/*
+ * Algorithm 4: Fixed Lookback Fusion (V4)
+ */
+class FixedLookbackFusionAlgorithm extends TimeRealignedFusionAlgorithm {
+    public name = 'Fixed Lookback (V4)';
+
+    pushBle(rawSpeed: number, arrivalTime: number, latencyMs: number) {
+        if (rawSpeed == null || isNaN(rawSpeed)) return;
+
+        // Use configured lookback, default to 400ms if not set
+        const lookback = this.params.lookbackMs ?? 400;
+        const captureTime = arrivalTime - lookback;
+
+        // Same boilerplate as V2/V3 from here
+        this.lastBleSpeedRaw = rawSpeed;
+        this.bleSpeedHistory.push({ speed: rawSpeed, time: captureTime });
+        if (this.bleSpeedHistory.length > 5) {
+            this.bleSpeedHistory.shift();
+        }
+
+        if (!this.isCalibrated) {
+            this.attemptCalibration();
+        }
+
+        const estimatedAtTime = this.getEstimatedSpeedAt(captureTime);
+        const bleSpeedMps = rawSpeed * this.speedConversionFactor;
+
+        let diff = 0;
+        if (estimatedAtTime !== null) {
+            diff = bleSpeedMps - estimatedAtTime;
+        } else {
+            diff = bleSpeedMps - this.currentSpeedMps;
+        }
+
+        this.applyCorrection(diff, bleSpeedMps);
+    }
+
+    getDebugState(): FusionDebugState {
+        const base = super.getDebugState();
+        return {
+            ...base,
+            algorithmName: `Fixed Lookback (${this.params.lookbackMs ?? 400}ms)`
+        };
+    }
+}
+
 
 /*
- * Algorithm 4: Passthrough
+ * Algorithm 5: Passthrough
  */
 class PassthroughAlgorithm implements FusionAlgorithm {
     public name = 'Passthrough (BLE Only)';
     private lastSpeed: number = 0;
 
     reset() { }
+    setParams(params: any) { }
 
     pushMotion(accel: Vector3, timestamp: number) { }
 
@@ -423,7 +471,7 @@ export class FusionEngine {
         };
     }
 
-    public setAlgorithm(type: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency') {
+    public setAlgorithm(type: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback', params?: any) {
         this.algorithm.reset();
         switch (type) {
             case 'passthrough':
@@ -435,12 +483,22 @@ export class FusionEngine {
             case 'median-latency':
                 this.algorithm = new MedianLatencyFusionAlgorithm();
                 break;
+            case 'fixed-lookback':
+                this.algorithm = new FixedLookbackFusionAlgorithm();
+                break;
             case 'fusion':
             default:
                 this.algorithm = new InertialFusionAlgorithm();
                 break;
         }
+        if (params) {
+            this.algorithm.setParams(params);
+        }
         this.notifySpeed(0);
+    }
+
+    public setAlgorithmParams(params: any) {
+        this.algorithm.setParams(params);
     }
 
     public getDebugState() {
@@ -472,7 +530,6 @@ export class FusionEngine {
     public addBleMeasurement(speed: number, latencyMs?: number) {
         const now = Date.now();
         const latency = latencyMs ?? 0;
-        // Passed explicitly to algorithm now
         this.algorithm.pushBle(speed, now, latency);
     }
 

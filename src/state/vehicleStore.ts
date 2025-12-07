@@ -14,9 +14,11 @@ interface VehicleStateStore {
   setLastLatency(latency: number | null): void;
   toggleAutoRefresh(): void;
   fusionDebugEnabled: boolean;
-  currentFusionAlgo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency';
+  fusionAlgoParams: Record<string, any>;
+  currentFusionAlgo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback';
   setFusionDebugEnabled(enabled: boolean): void;
-  setFusionAlgo(algo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency'): void;
+  setFusionAlgo(algo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback'): void;
+  setAlgoParam(algo: string, key: string, value: any): void;
 }
 
 export const useVehicleStore = create<VehicleStateStore>((set, get) => ({
@@ -35,7 +37,19 @@ export const useVehicleStore = create<VehicleStateStore>((set, get) => ({
     set({ autoRefreshActive: !current });
   },
   fusionDebugEnabled: false,
+  fusionAlgoParams: {
+    'fixed-lookback': { lookbackMs: 400 },
+  },
   currentFusionAlgo: 'fusion',
   setFusionDebugEnabled: (enabled) => set({ fusionDebugEnabled: enabled }),
   setFusionAlgo: (algo) => set({ currentFusionAlgo: algo }),
+  setAlgoParam: (algo, key, value) => set((state) => ({
+    fusionAlgoParams: {
+      ...state.fusionAlgoParams,
+      [algo]: {
+        ...(state.fusionAlgoParams[algo] || {}),
+        [key]: value
+      }
+    }
+  })),
 }));
