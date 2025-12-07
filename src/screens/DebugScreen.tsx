@@ -95,6 +95,7 @@ function ParameterConfig({ theme }: { theme: any }) {
 }
 
 export function DebugScreen({ onClose }: DebugScreenProps) {
+  const insets = useSafeAreaInsets();
   const [vin, setVin] = useState('');
   const [profileName, setProfileName] = useState('');
   const [profiles, setProfiles] = useState<StoredProfile[]>([]);
@@ -752,7 +753,7 @@ export function DebugScreen({ onClose }: DebugScreenProps) {
       </ScrollView>
       {onClose && (
         <TouchableOpacity
-          style={[styles.closeButton, { backgroundColor: theme.cardBackground, top: 20 + useSafeAreaInsets().top }]}
+          style={[styles.closeButton, { backgroundColor: theme.cardBackground, top: 20 + insets.top }]}
           onPress={onClose}
         >
           <MaterialIcons name="close" size={24} color={theme.text} />
