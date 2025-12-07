@@ -536,6 +536,8 @@ class PassthroughAlgorithm implements FusionAlgorithm {
     }
 }
 
+import { DeviceMotion } from 'expo-sensors';
+
 /*
  * Engine Manager (Singleton)
  */
@@ -546,9 +548,11 @@ export class FusionEngine {
     private calibrationListeners: Set<CalibrationCallback> = new Set();
     private timer: NodeJS.Timeout | null = null;
     private lastUpdateTime: number = 0;
+    private motionSubscription: any = null; // Subscription type
 
     private constructor() {
         this.algorithm = new InertialFusionAlgorithm();
+        DeviceMotion.setUpdateInterval(20);
     }
 
     public static getInstance(): FusionEngine {
@@ -615,14 +619,41 @@ export class FusionEngine {
 
     private start() {
         if (this.timer) return;
+
+        // Start Timer
         this.lastUpdateTime = Date.now();
         this.timer = setInterval(this.tick, 20); // 50Hz
+
+        // Start Sensors
+        this.startSensors();
     }
 
     private stop() {
         if (this.timer) {
             clearInterval(this.timer);
             this.timer = null;
+        }
+        this.stopSensors();
+    }
+
+    private startSensors() {
+        if (this.motionSubscription) return;
+
+        DeviceMotion.requestPermissionsAsync().then(({ status }) => {
+            if (status === 'granted') {
+                this.motionSubscription = DeviceMotion.addListener((event) => {
+                    if (event.acceleration) {
+                        this.handleMotionUpdate(event.acceleration);
+                    }
+                });
+            }
+        });
+    }
+
+    private stopSensors() {
+        if (this.motionSubscription) {
+            this.motionSubscription.remove();
+            this.motionSubscription = null;
         }
     }
 
@@ -631,7 +662,7 @@ export class FusionEngine {
         this.notifyCalibration(false);
     }
 
-    public handleMotionUpdate(accel: Vector3) {
+    private handleMotionUpdate(accel: Vector3) {
         this.algorithm.pushMotion(accel, Date.now());
     }
 

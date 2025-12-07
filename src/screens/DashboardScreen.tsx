@@ -16,6 +16,7 @@ import { useVehicleStore } from '@state/vehicleStore';
 import { SpeedReadout } from '@components/SpeedReadout';
 import { LatencyReadout } from '@components/LatencyReadout';
 import { FusionDebugOverlay } from '@components/FusionDebugOverlay';
+import { FusionController } from '@components/FusionController';
 
 export function DashboardScreen() {
   const [isLandscape, setIsLandscape] = useState(false);
@@ -136,6 +137,7 @@ export function DashboardScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <FusionController />
       <View style={styles.screen}>
         <View
           style={[
