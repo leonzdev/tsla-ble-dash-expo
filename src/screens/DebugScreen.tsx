@@ -728,6 +728,9 @@ export function DebugScreen({ onClose }: DebugScreenProps) {
               <Picker.Item label="BLE Passthrough" value="passthrough" />
             </Picker>
           </Field>
+
+          <ParameterConfig theme={theme} />
+
           <View style={styles.toggleRow}>
             <Text style={styles.toggleLabel}>Slope Correction</Text>
             <Switch
