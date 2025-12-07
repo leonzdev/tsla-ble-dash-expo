@@ -557,190 +557,196 @@ export function DebugScreen({ onClose }: DebugScreenProps) {
   }, [deviceInfo]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>Vehicle</Text>
-      <View style={styles.fieldGroup}>
-        <Field label="VIN">
-          <TextInput
-            value={vin}
-            onChangeText={(value) => setVin(normalizeVin(value))}
-            placeholder="5YJ3E1EA7JF000000"
-            placeholderTextColor="#64748b"
-            style={styles.input}
-            autoCapitalize="characters"
-          />
-        </Field>
-        <Text style={styles.deviceInfoLabel}>Connected Device</Text>
-        <Text style={styles.deviceInfo}>{deviceInfoText}</Text>
-        <View style={styles.row}>
-          <AppButton
-            label="Verify VIN"
-            onPress={handleSelectVehicle}
-            variant="primary"
-            disabled={isBusy('select-vehicle')}
-            fullWidth
-          />
+    <>
+      <ScrollView contentContainerStyle={[styles.container, { paddingTop: useSafeAreaInsets().top + 60 }]}>
+        <Text style={styles.heading}>Vehicle</Text>
+        <View style={styles.fieldGroup}>
+          <Field label="VIN">
+            <TextInput
+              value={vin}
+              onChangeText={(value) => setVin(normalizeVin(value))}
+              placeholder="5YJ3E1EA7JF000000"
+              placeholderTextColor="#64748b"
+              style={styles.input}
+              autoCapitalize="characters"
+            />
+          </Field>
+          <Text style={styles.deviceInfoLabel}>Connected Device</Text>
+          <Text style={styles.deviceInfo}>{deviceInfoText}</Text>
+          <View style={styles.row}>
+            <AppButton
+              label="Verify VIN"
+              onPress={handleSelectVehicle}
+              variant="primary"
+              disabled={isBusy('select-vehicle')}
+              fullWidth
+            />
+          </View>
         </View>
-      </View>
 
-      <Text style={styles.heading}>Keys</Text>
-      <View style={styles.fieldGroup}>
-        <Field label="Profile">
-          <Picker
-            selectedValue={selectedProfileId ?? ''}
-            onValueChange={(value) => handleProfileChange(value || null)}
-            dropdownIconColor="#94a3b8"
-            style={styles.picker}
-          >
-            <Picker.Item label="New profile…" value="" />
-            {profiles.map((profile) => (
-              <Picker.Item key={profile.id} label={profile.name} value={profile.id} />
-            ))}
-          </Picker>
-        </Field>
-        <Field label="Profile Name">
-          <TextInput
-            value={profileName}
-            onChangeText={setProfileName}
-            placeholder="Driver Profile"
-            placeholderTextColor="#64748b"
-            style={styles.input}
-          />
-        </Field>
-        <Field label="Private key (PEM)">
-          <TextInput
-            value={privateKeyPem}
-            onChangeText={(value) => {
-              setPrivateKeyPem(value);
-              setPrivateKey(null);
-            }}
-            placeholder="Paste EC PRIVATE KEY generated via tesla-keygen…"
-            placeholderTextColor="#64748b"
-            style={[styles.input, styles.multiline]}
-            multiline
-          />
-        </Field>
-        <Field label="Public key (share with vehicle)">
-          <TextInput
-            value={publicKeyPem}
-            editable={false}
-            placeholder="Generate or import a key first"
-            placeholderTextColor="#64748b"
-            style={[styles.input, styles.multiline, styles.readonlyInput]}
-            multiline
-          />
-        </Field>
-        <View style={styles.row}>
-          <AppButton
-            label="Generate Key"
-            onPress={handleGenerateKey}
-            variant="primary"
-            disabled={isBusy('generate-key')}
-            fullWidth
-          />
-          <AppButton label="Save Profile" onPress={handleSaveProfile} fullWidth />
+        <Text style={styles.heading}>Keys</Text>
+        <View style={styles.fieldGroup}>
+          <Field label="Profile">
+            <Picker
+              selectedValue={selectedProfileId ?? ''}
+              onValueChange={(value) => handleProfileChange(value || null)}
+              dropdownIconColor="#94a3b8"
+              style={styles.picker}
+            >
+              <Picker.Item label="New profile…" value="" />
+              {profiles.map((profile) => (
+                <Picker.Item key={profile.id} label={profile.name} value={profile.id} />
+              ))}
+            </Picker>
+          </Field>
+          <Field label="Profile Name">
+            <TextInput
+              value={profileName}
+              onChangeText={setProfileName}
+              placeholder="Driver Profile"
+              placeholderTextColor="#64748b"
+              style={styles.input}
+            />
+          </Field>
+          <Field label="Private key (PEM)">
+            <TextInput
+              value={privateKeyPem}
+              onChangeText={(value) => {
+                setPrivateKeyPem(value);
+                setPrivateKey(null);
+              }}
+              placeholder="Paste EC PRIVATE KEY generated via tesla-keygen…"
+              placeholderTextColor="#64748b"
+              style={[styles.input, styles.multiline]}
+              multiline
+            />
+          </Field>
+          <Field label="Public key (share with vehicle)">
+            <TextInput
+              value={publicKeyPem}
+              editable={false}
+              placeholder="Generate or import a key first"
+              placeholderTextColor="#64748b"
+              style={[styles.input, styles.multiline, styles.readonlyInput]}
+              multiline
+            />
+          </Field>
+          <View style={styles.row}>
+            <AppButton
+              label="Generate Key"
+              onPress={handleGenerateKey}
+              variant="primary"
+              disabled={isBusy('generate-key')}
+              fullWidth
+            />
+            <AppButton label="Save Profile" onPress={handleSaveProfile} fullWidth />
+          </View>
+          <View style={styles.row}>
+            <AppButton label="New Profile" onPress={() => handleProfileChange(null)} fullWidth />
+            <AppButton label="Delete Profile" onPress={handleDeleteProfile} variant="danger" fullWidth />
+          </View>
+          <View style={styles.row}>
+            <AppButton
+              label="Enroll Key"
+              onPress={handleEnrollKey}
+              disabled={isBusy('enroll')}
+              fullWidth
+            />
+            <AppButton
+              label="Connect"
+              onPress={handleEnsureSession}
+              disabled={isBusy('connect-session')}
+              fullWidth
+            />
+          </View>
         </View>
-        <View style={styles.row}>
-          <AppButton label="New Profile" onPress={() => handleProfileChange(null)} fullWidth />
-          <AppButton label="Delete Profile" onPress={handleDeleteProfile} variant="danger" fullWidth />
-        </View>
-        <View style={styles.row}>
-          <AppButton
-            label="Enroll Key"
-            onPress={handleEnrollKey}
-            disabled={isBusy('enroll')}
-            fullWidth
-          />
-          <AppButton
-            label="Connect"
-            onPress={handleEnsureSession}
-            disabled={isBusy('connect-session')}
-            fullWidth
-          />
-        </View>
-      </View>
 
-      <Text style={styles.heading}>Vehicle State</Text>
-      <View style={styles.fieldGroup}>
-        <Field label="State Category">
-          <Picker
-            selectedValue={stateCategory}
-            onValueChange={(value) => setStateCategory(value as StateCategory)}
-            dropdownIconColor="#94a3b8"
-            style={styles.picker}
-          >
-            {stateCategoryOptions.map((value) => (
-              <Picker.Item key={value} label={prettyLabel(value)} value={value} />
-            ))}
-          </Picker>
-        </Field>
-        <Field label="Auto Refresh Interval (ms)">
-          <TextInput
-            value={String(refreshInterval)}
-            onChangeText={(value) => setRefreshInterval(Number(value))}
-            onEndEditing={(event) => handleRefreshIntervalBlur(event.nativeEvent.text)}
-            keyboardType="numeric"
-            style={styles.input}
-          />
-        </Field>
-        <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Auto Refresh</Text>
-          <Switch
-            value={autoRefreshActive}
-            onValueChange={(value) => setStoreAutoRefreshActive(value)}
-          />
+        <Text style={styles.heading}>Vehicle State</Text>
+        <View style={styles.fieldGroup}>
+          <Field label="State Category">
+            <Picker
+              selectedValue={stateCategory}
+              onValueChange={(value) => setStateCategory(value as StateCategory)}
+              dropdownIconColor="#94a3b8"
+              style={styles.picker}
+            >
+              {stateCategoryOptions.map((value) => (
+                <Picker.Item key={value} label={prettyLabel(value)} value={value} />
+              ))}
+            </Picker>
+          </Field>
+          <Field label="Auto Refresh Interval (ms)">
+            <TextInput
+              value={String(refreshInterval)}
+              onChangeText={(value) => setRefreshInterval(Number(value))}
+              onEndEditing={(event) => handleRefreshIntervalBlur(event.nativeEvent.text)}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+          </Field>
+          <View style={styles.toggleRow}>
+            <Text style={styles.toggleLabel}>Auto Refresh</Text>
+            <Switch
+              value={autoRefreshActive}
+              onValueChange={(value) => setStoreAutoRefreshActive(value)}
+            />
+          </View>
+          <View style={styles.row}>
+            <AppButton
+              label="Fetch State"
+              onPress={handleManualFetch}
+              disabled={isBusy('fetch-state')}
+              variant="primary"
+              fullWidth
+            />
+          </View>
+          <Text style={styles.logOutput}>{stateOutput}</Text>
         </View>
-        <View style={styles.row}>
-          <AppButton
-            label="Fetch State"
-            onPress={handleManualFetch}
-            disabled={isBusy('fetch-state')}
-            variant="primary"
-            fullWidth
-          />
+
+        <Text style={styles.heading}>Sensor Fusion</Text>
+        <View style={styles.fieldGroup}>
+          <View style={styles.toggleRow}>
+            <Text style={styles.toggleLabel}>Debug Overlay</Text>
+            <Switch
+              value={fusionDebugEnabled}
+              onValueChange={setFusionDebugEnabled}
+            />
+          </View>
+          <Field label="Algorithm">
+            <Picker
+              selectedValue={currentFusionAlgo}
+              onValueChange={(val) => setFusionAlgo(val as any)}
+              dropdownIconColor="#94a3b8"
+              style={styles.picker}
+            >
+              <Picker.Item label="Inertial Fusion V1 (Basic)" value="fusion" />
+              <Picker.Item label="Time-Realigned Fusion (V2)" value="time-realigned" />
+              <Picker.Item label="Median Latency Fusion (V3)" value="median-latency" />
+              <Picker.Item label="Fixed Lookback (V4)" value="fixed-lookback" />
+              <Picker.Item label="BLE Passthrough" value="passthrough" />
+            </Picker>
+          </Field>
+
         </View>
-        <Text style={styles.logOutput}>{stateOutput}</Text>
-      </View>
 
-      <Text style={styles.heading}>Sensor Fusion</Text>
-      <View style={styles.fieldGroup}>
-        <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Debug Overlay</Text>
-          <Switch
-            value={fusionDebugEnabled}
-            onValueChange={setFusionDebugEnabled}
-          />
+
+        <Text style={styles.heading}>Log</Text>
+        <View style={styles.fieldGroup}>
+          <Text style={styles.logOutput}>{logOutput}</Text>
         </View>
-        <Field label="Algorithm">
-          <Picker
-            selectedValue={currentFusionAlgo}
-            onValueChange={(val) => setFusionAlgo(val as any)}
-            dropdownIconColor="#94a3b8"
-            style={styles.picker}
-          >
-            <Picker.Item label="Inertial Fusion V1 (Basic)" value="fusion" />
-            <Picker.Item label="Time-Realigned Fusion (V2)" value="time-realigned" />
-            <Picker.Item label="Median Latency Fusion (V3)" value="median-latency" />
-            <Picker.Item label="Fixed Lookback (V4)" value="fixed-lookback" />
-            <Picker.Item label="BLE Passthrough" value="passthrough" />
-          </Picker>
-        </Field>
 
-        <ParameterConfig theme={theme} />
-
+        {/* Spacer for bottom safe area */}
+        <View style={{ height: 40 }} />
+      </ScrollView>
+      {onClose && (
         <TouchableOpacity
-          style={[styles.closeButton, { backgroundColor: theme.cardBackground }]}
+          style={[styles.closeButton, { backgroundColor: theme.cardBackground, top: 20 + useSafeAreaInsets().top }]}
           onPress={onClose}
         >
           <MaterialIcons name="close" size={24} color={theme.text} />
         </TouchableOpacity>
-      </View>
-
-      <Text style={styles.heading}>Log</Text>
-      <View style={styles.fieldGroup}>
-        <Text style={styles.logOutput}>{logOutput}</Text>
-      </View>
-    </ScrollView>
+      )}
+    </>
   );
 }
 
