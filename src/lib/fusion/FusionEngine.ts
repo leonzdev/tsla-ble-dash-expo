@@ -14,6 +14,7 @@ import {
     MedianLatencyFusionAlgorithm,
     FixedLookbackFusionAlgorithm,
     PassthroughAlgorithm,
+    CalibrationFusionAlgorithm,
 } from './strategies';
 
 import { DeviceMotion } from 'expo-sensors';
@@ -62,7 +63,7 @@ export class FusionEngine {
         };
     }
 
-    public setAlgorithm(type: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback', params?: any) {
+    public setAlgorithm(type: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback' | 'calibration', params?: any) {
         this.algorithm.reset();
 
         switch (type) {
@@ -77,6 +78,9 @@ export class FusionEngine {
                 break;
             case 'fixed-lookback':
                 this.algorithm = new FixedLookbackFusionAlgorithm();
+                break;
+            case 'calibration':
+                this.algorithm = new CalibrationFusionAlgorithm();
                 break;
             case 'fusion':
             default:

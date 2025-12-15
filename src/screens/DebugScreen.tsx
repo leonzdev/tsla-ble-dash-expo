@@ -91,6 +91,72 @@ function ParameterConfig({ theme }: { theme: any }) {
     );
   }
 
+  if (activeAlgo === 'calibration') {
+    const currentLookback = params['calibration']?.lookbackMs ?? 400;
+    const accelOffset = params['calibration']?.accelOffset ?? 0.02;
+    const highPassThreshold = params['calibration']?.highPassThreshold ?? 0.05;
+
+    return (
+      <View style={styles.configContainer}>
+        <Text style={[styles.configTitle, { color: theme.text }]}>Calibration Fusion Config</Text>
+
+        {/* Lookback */}
+        <View style={styles.configRow}>
+          <Text style={[styles.configLabel, { color: theme.textSecondary }]}>
+            Lookback: {currentLookback}ms
+          </Text>
+          <Slider
+            style={{ width: '100%', height: 40 }}
+            minimumValue={0}
+            maximumValue={1000}
+            step={10}
+            value={currentLookback}
+            onValueChange={(val: number) => setParam('calibration', 'lookbackMs', val)}
+            minimumTrackTintColor={theme.accent}
+            maximumTrackTintColor={theme.cardBorder}
+            thumbTintColor={theme.accent}
+          />
+        </View>
+
+        {/* Accel Offset */}
+        <View style={styles.configRow}>
+          <Text style={[styles.configLabel, { color: theme.textSecondary }]}>
+            Accel Offset: {accelOffset.toFixed(3)} m/s²
+          </Text>
+          <Slider
+            style={{ width: '100%', height: 40 }}
+            minimumValue={0.00}
+            maximumValue={0.10}
+            step={0.005}
+            value={accelOffset}
+            onValueChange={(val: number) => setParam('calibration', 'accelOffset', val)}
+            minimumTrackTintColor={theme.accent}
+            maximumTrackTintColor={theme.cardBorder}
+            thumbTintColor={theme.accent}
+          />
+        </View>
+
+        {/* High Pass Threshold */}
+        <View style={styles.configRow}>
+          <Text style={[styles.configLabel, { color: theme.textSecondary }]}>
+            High Pass: {highPassThreshold.toFixed(3)} m/s²
+          </Text>
+          <Slider
+            style={{ width: '100%', height: 40 }}
+            minimumValue={0.00}
+            maximumValue={0.10}
+            step={0.005}
+            value={highPassThreshold}
+            onValueChange={(val: number) => setParam('calibration', 'highPassThreshold', val)}
+            minimumTrackTintColor={theme.accent}
+            maximumTrackTintColor={theme.cardBorder}
+            thumbTintColor={theme.accent}
+          />
+        </View>
+      </View>
+    );
+  }
+
   return null;
 }
 
@@ -727,6 +793,7 @@ export function DebugScreen({ onClose }: DebugScreenProps) {
               <Picker.Item label="Median Latency Fusion (V3)" value="median-latency" />
               <Picker.Item label="Fixed Lookback (V4)" value="fixed-lookback" />
               <Picker.Item label="BLE Passthrough" value="passthrough" />
+              <Picker.Item label="Calibration Fusion (V5)" value="calibration" />
             </Picker>
           </Field>
 
