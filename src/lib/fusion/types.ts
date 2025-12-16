@@ -23,6 +23,7 @@ export interface FusionAlgorithm {
     name: string;
     reset(): void;
     setParams(params: any): void;
+    setGear(gear: string | null): void;
     pushMotion(accel: Vector3, timestamp: number): void;
     pushBle(speed: number, arrivalTime: number, latencyMs: number): void;
     update(dt: number): number;

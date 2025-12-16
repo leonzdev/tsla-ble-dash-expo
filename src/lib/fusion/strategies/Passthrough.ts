@@ -10,6 +10,7 @@ export class PassthroughAlgorithm implements FusionAlgorithm {
 
     reset() { }
     setParams(params: any) { }
+    setGear(gear: string | null) { }
 
     pushMotion(accel: Vector3, timestamp: number) { }
 

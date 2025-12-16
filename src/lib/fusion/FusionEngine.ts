@@ -30,6 +30,7 @@ export class FusionEngine {
     private timer: NodeJS.Timeout | null = null;
     private lastUpdateTime: number = 0;
     private motionSubscription: any = null; // Subscription type
+    private lastGear: string | null = null;
 
     private constructor() {
         this.algorithm = new InertialFusionAlgorithm();
@@ -90,11 +91,19 @@ export class FusionEngine {
         if (params) {
             this.algorithm.setParams(params);
         }
+        if (this.lastGear !== null) {
+            this.algorithm.setGear(this.lastGear);
+        }
         this.notifySpeed(0);
     }
 
     public setAlgorithmParams(params: any) {
         this.algorithm.setParams(params);
+    }
+
+    public setGear(gear: string | null) {
+        this.lastGear = gear;
+        this.algorithm.setGear(gear);
     }
 
     public getDebugState() {
@@ -143,6 +152,9 @@ export class FusionEngine {
 
     public resetCalibration() {
         this.algorithm.reset();
+        if (this.lastGear !== null) {
+            this.algorithm.setGear(this.lastGear);
+        }
         this.notifyCalibration(false);
     }
 

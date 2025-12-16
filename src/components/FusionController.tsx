@@ -17,6 +17,7 @@ export function FusionController() {
     const latencyMs = useVehicleStore((state) => state.lastLatencyMs);
     const driveData = driveState?.vehicleData?.driveState ?? driveState?.vehicleData?.drive_state ?? null;
     const rawSpeed = parseVehicleSpeed(driveData);
+    const gear = parseGear(driveData);
 
     // Config
     const activeAlgo = useVehicleStore(state => state.currentFusionAlgo);
@@ -31,6 +32,11 @@ export function FusionController() {
             slopeCorrectionEnabled
         });
     }, [activeAlgo, algoParams, slopeCorrectionEnabled]);
+
+    // Sync gear/direction
+    useEffect(() => {
+        FusionEngine.getInstance().setGear(gear);
+    }, [gear]);
 
     // Feed BLE Measurements
     useEffect(() => {
@@ -57,6 +63,15 @@ function parseVehicleSpeed(driveState: any): number | null {
         if (typeof candidate === 'number' && Number.isFinite(candidate)) {
             return candidate;
         }
+    }
+    return null;
+}
+
+function parseGear(driveState: any): string | null {
+    const candidate = driveState?.shiftState ?? driveState?.shift_state ?? driveState?.gear;
+    if (typeof candidate === 'string' && candidate.trim()) {
+        const first = candidate.trim().charAt(0).toUpperCase();
+        if (['P', 'R', 'N', 'D'].includes(first)) return first;
     }
     return null;
 }

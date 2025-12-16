@@ -8,6 +8,7 @@ import {
     PROPORTIONAL_GAIN,
     SENSOR_SYNC_SLOP,
 } from './types';
+import { normalizeGear } from './gearUtils';
 
 /*
  * Base Class for Inertial Physics & Calibration
@@ -22,6 +23,7 @@ export abstract class BaseInertialAlgorithm implements FusionAlgorithm {
     protected forwardVector: Vector3 | null = null;
     protected speedConversionFactor: number = 0.44704;
     protected isCalibrated: boolean = false;
+    protected directionSign: number = 1; // +1 for drive/neutral, -1 for reverse
 
     protected recentAccels: { vec: Vector3; time: number }[] = [];
     protected bleSpeedHistory: { speed: number; time: number }[] = [];
@@ -34,6 +36,7 @@ export abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         this.forwardVector = null;
         this.speedConversionFactor = 0.44704;
         this.isCalibrated = false;
+        this.directionSign = 1;
         this.recentAccels = [];
         this.bleSpeedHistory = [];
         this.lastEffectiveAccel = 0;
@@ -42,6 +45,11 @@ export abstract class BaseInertialAlgorithm implements FusionAlgorithm {
 
     setParams(params: any) {
         this.params = params || {};
+    }
+
+    setGear(gear: string | null) {
+        const normalized = normalizeGear(gear);
+        this.directionSign = normalized === 'R' ? -1 : 1;
     }
 
     protected onReset() { }
@@ -114,7 +122,7 @@ export abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         let sensorForwardAccel = (latest.x * fx) + (latest.y * fy) + (latest.z * fz);
 
         if (Math.abs(sensorForwardAccel) > 0.1) {
-            return sensorForwardAccel;
+            return sensorForwardAccel * this.directionSign;
         }
         return 0;
     }
@@ -180,7 +188,7 @@ export abstract class BaseInertialAlgorithm implements FusionAlgorithm {
         const speedDeltaRaw = latest.speed - prev.speed;
         const timeDelta = (latest.time - prev.time) / 1000;
         if (timeDelta <= 0.5) return;
-        const rawAccel = speedDeltaRaw / timeDelta;
+        const rawAccel = (speedDeltaRaw / timeDelta) * this.directionSign;
 
         if (rawAccel > 1.0 && latest.speed > MIN_CALIBRATION_SPEED) {
             let sumX = 0, sumY = 0, sumZ = 0, count = 0;
@@ -202,9 +210,9 @@ export abstract class BaseInertialAlgorithm implements FusionAlgorithm {
 
             if (magnitude > MIN_SENSOR_ACCEL) {
                 this.forwardVector = {
-                    x: avgX / magnitude,
-                    y: avgY / magnitude,
-                    z: avgZ / magnitude
+                    x: (avgX / magnitude) * this.directionSign,
+                    y: (avgY / magnitude) * this.directionSign,
+                    z: (avgZ / magnitude) * this.directionSign
                 };
                 const newFactor = magnitude / rawAccel;
                 if (newFactor > 0.2 && newFactor < 0.6) {
