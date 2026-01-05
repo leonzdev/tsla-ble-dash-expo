@@ -1,4 +1,4 @@
-import { BaseInertialAlgorithm } from '../BaseInertialAlgorithm';
+import { BaseInertialAlgorithm } from './BaseInertialAlgorithm';
 
 /*
  * Algorithm 1: Inertial Fusion (V1)

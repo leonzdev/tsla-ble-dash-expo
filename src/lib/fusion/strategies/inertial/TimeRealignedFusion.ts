@@ -1,5 +1,5 @@
-import { FusionDebugState } from '../types';
-import { BaseInertialAlgorithm } from '../BaseInertialAlgorithm';
+import { FusionDebugState } from '../../types';
+import { BaseInertialAlgorithm } from './BaseInertialAlgorithm';
 
 /*
  * Algorithm 2: Time-Realigned Fusion (V2)

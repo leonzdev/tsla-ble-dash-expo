@@ -1,3 +1,5 @@
+import { Vector3 } from '../../types';
+import { BaseInertialAlgorithm } from './BaseInertialAlgorithm';
 import { TimeRealignedFusionAlgorithm } from './TimeRealignedFusion';
 
 /*

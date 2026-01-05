@@ -1,4 +1,5 @@
-import { FusionDebugState } from '../types';
+import { FusionDebugState } from '../../types';
+import { BaseInertialAlgorithm } from './BaseInertialAlgorithm';
 import { TimeRealignedFusionAlgorithm } from './TimeRealignedFusion';
 
 /*

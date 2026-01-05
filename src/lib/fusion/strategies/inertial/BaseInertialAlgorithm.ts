@@ -7,8 +7,8 @@ import {
     SPEED_DECAY,
     PROPORTIONAL_GAIN,
     SENSOR_SYNC_SLOP,
-} from './types';
-import { normalizeGear } from './gearUtils';
+} from '../../types';
+import { normalizeGear } from '../../gearUtils';
 
 /*
  * Base Class for Inertial Physics & Calibration

@@ -1,4 +1,4 @@
-import { Vector3, FusionDebugState, FusionAlgorithm } from '../types';
+import { Vector3, FusionDebugState, FusionAlgorithm } from '../../types';
 
 /*
  * Passthrough Algorithm

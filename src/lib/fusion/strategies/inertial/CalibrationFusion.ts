@@ -5,8 +5,9 @@ import {
     MIN_SENSOR_ACCEL,
     SENSOR_SYNC_SLOP,
     Vector3,
-} from '../types';
-import { normalizeGear } from '../gearUtils';
+} from '../../types';
+import { BaseInertialAlgorithm } from './BaseInertialAlgorithm';
+import { normalizeGear } from '../../gearUtils';
 
 /*
  * Algorithm 5: Calibration Fusion (V5)
