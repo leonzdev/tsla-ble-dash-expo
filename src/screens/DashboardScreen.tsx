@@ -13,6 +13,10 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as NavigationBar from 'expo-navigation-bar';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useVehicleStore } from '@state/vehicleStore';
+import { SpeedReadout } from '@components/SpeedReadout';
+import { LatencyReadout } from '@components/LatencyReadout';
+import { FusionDebugOverlay } from '@components/FusionDebugOverlay';
+import { FusionController } from '@components/FusionController';
 
 export function DashboardScreen() {
   const [isLandscape, setIsLandscape] = useState(false);
@@ -26,13 +30,11 @@ export function DashboardScreen() {
   const latencyMs = useVehicleStore((state) => state.lastLatencyMs);
 
   const driveData = driveState?.vehicleData?.driveState ?? driveState?.vehicleData?.drive_state ?? null;
+  // REMOVED: const { speed, isCalibrated, debugState } = useFusedSpeed();
+  // Using isolated components instead to prevent re-renders
 
   const shortestSide = Math.min(width, height);
-  const speed = useMemo(() => parseVehicleSpeed(driveData), [driveData]);
   const gear = useMemo(() => formatShiftState(driveData?.shiftState ?? driveData?.shift_state), [driveData]);
-  const latencyText = useMemo(() => formatLatencyDisplay(latencyMs), [latencyMs]);
-  const latencyColor = useMemo(() => latencyColorForValue(latencyMs), [latencyMs]);
-  const speedText = formatSpeedDisplay(speed);
   const speedFontSize = shortestSide * 0.9;
   const orientationIconColor = isLandscape ? theme.orientationIconActive : theme.orientationIcon;
   const orientationOutlineColor = isLandscape ? theme.orientationIconActive : undefined;
@@ -81,8 +83,8 @@ export function DashboardScreen() {
     void applyNavVisibility();
 
     return () => {
-      NavigationBar.setVisibilityAsync('visible').catch(() => {});
-      NavigationBar.setBehaviorAsync('inset-swipe').catch(() => {});
+      NavigationBar.setVisibilityAsync('visible').catch(() => { });
+      NavigationBar.setBehaviorAsync('inset-swipe').catch(() => { });
     };
   }, [isLandscape]);
 
@@ -135,6 +137,7 @@ export function DashboardScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <FusionController />
       <View style={styles.screen}>
         <View
           style={[
@@ -148,14 +151,7 @@ export function DashboardScreen() {
         >
           <View style={[styles.readoutRow, isLandscape && styles.readoutRowLandscape]}>
             <View style={styles.speedWrapper}>
-              <Text
-                style={[styles.speed, { fontSize: speedFontSize, color: theme.speedText }]}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.2}
-              >
-                {speedText}
-              </Text>
+              <SpeedReadout fontSize={speedFontSize} theme={theme} />
             </View>
 
             {isLandscape && (
@@ -210,15 +206,13 @@ export function DashboardScreen() {
           )}
 
           <View style={[styles.latencyContainer, isLandscape && styles.latencyContainerLandscape]}>
-            <Text
-              style={[styles.latency, { color: latencyColor, textShadowColor: theme.latencyShadow }]}
-            >
-              {latencyText}
-            </Text>
+            <LatencyReadout theme={theme} />
           </View>
 
           {!keyLoaded && <Text style={styles.keyStatus}>Key not loaded</Text>}
+          {!keyLoaded && <Text style={styles.keyStatus}>Key not loaded</Text>}
         </View>
+        <FusionDebugOverlay />
       </View>
     </View>
   );
@@ -437,9 +431,21 @@ const styles = StyleSheet.create({
     shadowColor: '#000000',
     shadowOpacity: 0.08,
     shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
+  debugOverlay: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    padding: 8,
+    borderRadius: 8,
+  },
+  debugText: {
+    color: '#0f0',
+    fontSize: 12,
+    fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
+  }
 });
 
 type DashboardTheme = {
