@@ -163,7 +163,7 @@ export class CalibrationFusionAlgorithm implements FusionAlgorithm {
 
     getDebugState(): FusionDebugState {
         let displayAccel = this.lastEffectiveAccel;
-        if (!this.isCalibrated && this.accelHistory.length > 0) {
+        if (this.accelHistory.length > 0) {
             displayAccel = this.accelHistory[this.accelHistory.length - 1].scalar;
         }
 

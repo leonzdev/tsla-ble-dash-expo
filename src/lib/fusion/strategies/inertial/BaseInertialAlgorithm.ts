@@ -89,8 +89,9 @@ export abstract class BaseInertialAlgorithm implements FusionAlgorithm {
     protected onPostUpdate(dt: number) { }
 
     getDebugState(): FusionDebugState {
+        // Always show the live instantaneous sensor magnitude for diagnostics.
         let displayAccel = this.lastEffectiveAccel;
-        if (!this.isCalibrated && this.recentAccels.length > 0) {
+        if (this.recentAccels.length > 0) {
             const latest = this.recentAccels[this.recentAccels.length - 1].vec;
             displayAccel = Math.sqrt(latest.x * latest.x + latest.y * latest.y + latest.z * latest.z);
         }

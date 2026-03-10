@@ -794,6 +794,7 @@ export function DebugScreen({ onClose }: DebugScreenProps) {
               <Picker.Item label="Fixed Lookback (V4)" value="fixed-lookback" />
               <Picker.Item label="BLE Passthrough" value="passthrough" />
               <Picker.Item label="Calibration Fusion (V5)" value="calibration" />
+              <Picker.Item label="EKF Rewind-Replay (V6)" value="ekf-rewind-replay" />
             </Picker>
           </Field>
 

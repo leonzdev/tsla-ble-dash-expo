@@ -4,3 +4,4 @@ export { MedianLatencyFusionAlgorithm } from './inertial/MedianLatencyFusion';
 export { FixedLookbackFusionAlgorithm } from './inertial/FixedLookbackFusion';
 export { PassthroughAlgorithm } from './passthrough/Passthrough';
 export { CalibrationFusionAlgorithm } from './inertial/CalibrationFusion';
+export { EkfRewindReplayAlgorithm } from './inertial/EkfRewindReplay';

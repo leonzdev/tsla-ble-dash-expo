@@ -15,6 +15,7 @@ import {
     FixedLookbackFusionAlgorithm,
     PassthroughAlgorithm,
     CalibrationFusionAlgorithm,
+    EkfRewindReplayAlgorithm,
 } from './strategies';
 
 import { DeviceMotion } from 'expo-sensors';
@@ -64,7 +65,7 @@ export class FusionEngine {
         };
     }
 
-    public setAlgorithm(type: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback' | 'calibration', params?: any) {
+    public setAlgorithm(type: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback' | 'calibration' | 'ekf-rewind-replay', params?: any) {
         this.algorithm.reset();
 
         switch (type) {
@@ -82,6 +83,9 @@ export class FusionEngine {
                 break;
             case 'calibration':
                 this.algorithm = new CalibrationFusionAlgorithm();
+                break;
+            case 'ekf-rewind-replay':
+                this.algorithm = new EkfRewindReplayAlgorithm();
                 break;
             case 'fusion':
             default:

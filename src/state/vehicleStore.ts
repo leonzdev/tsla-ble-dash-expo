@@ -16,10 +16,10 @@ interface VehicleStateStore {
   fusionDebugEnabled: boolean;
   slopeCorrectionEnabled: boolean;
   fusionAlgoParams: Record<string, any>;
-  currentFusionAlgo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback' | 'calibration';
+  currentFusionAlgo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback' | 'calibration' | 'ekf-rewind-replay';
   setFusionDebugEnabled(enabled: boolean): void;
   setSlopeCorrectionEnabled(enabled: boolean): void;
-  setFusionAlgo(algo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback' | 'calibration'): void;
+  setFusionAlgo(algo: 'fusion' | 'passthrough' | 'time-realigned' | 'median-latency' | 'fixed-lookback' | 'calibration' | 'ekf-rewind-replay'): void;
   setAlgoParam(algo: string, key: string, value: any): void;
 }
 

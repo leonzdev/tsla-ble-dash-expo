@@ -14,6 +14,17 @@ export function FusionDebugOverlay() {
             <Text style={styles.debugText}>FUSED: {debugState.fusedSpeed?.toFixed(1)}</Text>
             <Text style={styles.debugText}>ACCEL: {debugState.accelerationMps2?.toFixed(2)}</Text>
             <Text style={styles.debugText}>SCALE: {debugState.conversionFactor?.toFixed(3)}</Text>
+            {debugState.accelBias != null && (
+                <Text style={styles.debugText}>BIAS: {debugState.accelBias.toFixed(4)}</Text>
+            )}
+            {debugState.isZupt != null && (
+                <Text style={[styles.debugText, debugState.isZupt && styles.zuptActive]}>
+                    ZUPT: {debugState.isZupt ? 'YES' : 'no'}
+                </Text>
+            )}
+            {debugState.bufferLength != null && (
+                <Text style={styles.debugText}>BUF: {debugState.bufferLength}</Text>
+            )}
         </View>
     );
 }
@@ -31,5 +42,8 @@ const styles = StyleSheet.create({
         color: '#0f0',
         fontSize: 12,
         fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
+    },
+    zuptActive: {
+        color: '#ff0',
     },
 });

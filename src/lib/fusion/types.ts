@@ -11,6 +11,9 @@ export interface FusionDebugState {
     isCalibrated: boolean;
     conversionFactor: number;
     accelerationMps2?: number;
+    accelBias?: number;
+    isZupt?: boolean;
+    bufferLength?: number;
 }
 
 export type SpeedUpdateCallback = (speed: number) => void;
